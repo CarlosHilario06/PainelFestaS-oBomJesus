@@ -237,10 +237,19 @@ var TelaAjustes = (function () {
   function restaurarBackup(ev) {
     var arquivo = ev.target.files && ev.target.files[0];
     if (!arquivo) return;
-    if (!confirm('Restaurar o backup vai SUBSTITUIR os produtos e vendas atuais. Continuar?')) {
-      ev.target.value = '';
-      return;
-    }
+    App.confirmar({
+      titulo: 'Restaurar este backup?',
+      texto: 'Os produtos e as vendas que estão aqui agora serão substituídos pelos do arquivo.',
+      botao: 'Restaurar'
+    }).then(function (confirmou) {
+      if (!confirmou) { ev.target.value = ''; return; }
+      lerBackup(ev);
+    });
+  }
+
+  function lerBackup(ev) {
+    var arquivo = ev.target.files && ev.target.files[0];
+    if (!arquivo) return;
     var leitor = new FileReader();
     leitor.onload = function () {
       try {
@@ -261,12 +270,26 @@ var TelaAjustes = (function () {
   }
 
   function zerarVendas() {
-    if (!confirm('Apagar TODAS as vendas registradas?\n\nOs produtos continuam cadastrados e a numeração dos pedidos volta para #1.')) return;
-    if (!confirm('Tem certeza mesmo? Isso não tem volta.\n\nDica: baixe o backup antes.')) return;
-    DB.apagarVendas();
-    TelaVendas.desenhar();
-    TelaCaixa.desenhar();
-    App.avisar('Vendas apagadas.');
+    var resumo = TelaVendas.calcularResumo('');
+    if (resumo.quantidade === 0) {
+      App.avisar('Não há vendas registradas para apagar.');
+      return;
+    }
+    var quantos = resumo.quantidade === 1
+      ? '1 pedido' : resumo.quantidade + ' pedidos';
+    App.confirmar({
+      titulo: 'Apagar todas as vendas?',
+      texto: 'São ' + quantos + ', somando ' + Dinheiro.formatar(resumo.total) +
+             '. Isso não tem volta — baixe o backup antes.\n\n' +
+             'Os produtos continuam cadastrados e a numeração volta para o #1.',
+      botao: 'Apagar tudo'
+    }).then(function (confirmou) {
+      if (!confirmou) return;
+      DB.apagarVendas();
+      TelaVendas.desenhar();
+      TelaCaixa.desenhar();
+      App.avisar('Vendas apagadas.');
+    });
   }
 
   return { iniciar: iniciar, carregar: carregar };

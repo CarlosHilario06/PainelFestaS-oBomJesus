@@ -407,6 +407,28 @@ main{padding:18px;max-width:1400px;margin:0 auto}
   @page{margin:3mm;size:58mm auto}
 }
 
+/* ===== Confirmação dentro do app ===== */
+/* Substitui o confirm() do navegador, que aparece colado no topo da
+   janela, com a cara do Chrome e sem relação nenhuma com o sistema. */
+.dialogo{
+  position:fixed;inset:0;background:var(--sobreposicao);z-index:120;
+  display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.dialogo.escondido{display:none !important}
+.dialogo-caixa{
+  background:var(--papel);border:1px solid var(--borda);border-radius:var(--raio);
+  box-shadow:var(--sombra);width:100%;max-width:420px;padding:22px;
+  animation:dialogoEntra .16s ease-out;
+}
+@keyframes dialogoEntra{from{opacity:0;transform:translateY(8px) scale(.98)}}
+@media (prefers-reduced-motion:reduce){.dialogo-caixa{animation:none}}
+.dialogo-caixa h3{margin:0 0 10px;font-size:1.08rem}
+.dialogo-caixa p{margin:0 0 20px;color:var(--texto-suave);font-size:.92rem;line-height:1.6;white-space:pre-line}
+.dialogo-acoes{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.dialogo-acoes button{min-width:120px}
+#dialogoConfirmar{border:1px solid transparent}
+#dialogoConfirmar:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+
 /* ===== Janela de pré-visualização ===== */
 .previa{
   position:fixed;inset:0;background:var(--sobreposicao);z-index:100;

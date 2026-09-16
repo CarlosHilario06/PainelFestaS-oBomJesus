@@ -185,10 +185,17 @@ var TelaVendas = (function () {
         bCancelar.className = 'perigo';
         bCancelar.textContent = 'Cancelar';
         bCancelar.addEventListener('click', function () {
-          if (!confirm('Cancelar o pedido #' + v.pedido + '?\n\nEle sai do total do caixa.')) return;
-          DB.cancelarVenda(v.id);
-          desenhar();
-          App.avisar('Pedido #' + v.pedido + ' cancelado.');
+          App.confirmar({
+            titulo: 'Cancelar o pedido #' + v.pedido + '?',
+            texto: 'O valor de ' + Dinheiro.formatar(v.total) + ' sai do total do caixa. ' +
+                   'O pedido continua na lista, marcado como cancelado.',
+            botao: 'Cancelar pedido'
+          }).then(function (confirmou) {
+            if (!confirmou) return;
+            DB.cancelarVenda(v.id);
+            desenhar();
+            App.avisar('Pedido #' + v.pedido + ' cancelado.');
+          });
         });
         acoes.appendChild(bCancelar);
       }

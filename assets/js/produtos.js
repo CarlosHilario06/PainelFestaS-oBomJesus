@@ -60,12 +60,18 @@ var TelaProdutos = (function () {
   function apagar(id) {
     var p = DB.acharProduto(id);
     if (!p) return;
-    if (!confirm('Apagar o produto "' + p.nome + '"?\n\nAs vendas já registradas continuam guardadas.')) return;
-    DB.removerProduto(id);
-    if (campoId.value === id) limparForm();
-    desenhar();
-    TelaCaixa.desenhar();
-    App.avisar('Produto apagado.');
+    App.confirmar({
+      titulo: 'Apagar "' + p.nome + '"?',
+      texto: 'Ele some da tela do caixa. As vendas já registradas continuam guardadas.',
+      botao: 'Apagar produto'
+    }).then(function (confirmou) {
+      if (!confirmou) return;
+      DB.removerProduto(id);
+      if (campoId.value === id) limparForm();
+      desenhar();
+      TelaCaixa.desenhar();
+      App.avisar('Produto apagado.');
+    });
   }
 
   function mover(id, direcao) {

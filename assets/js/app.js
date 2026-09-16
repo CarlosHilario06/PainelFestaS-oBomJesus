@@ -194,6 +194,48 @@ var App = (function () {
     }, 400);
   }
 
+  /* ---------- Confirmação dentro do app ----------
+     Devolve uma promessa: resolve true se a pessoa confirmar.
+     Enter confirma, Esc cancela, clicar fora cancela. */
+  function confirmar(opcoes) {
+    opcoes = opcoes || {};
+    var caixa = document.getElementById('dialogo');
+    var btnOk = document.getElementById('dialogoConfirmar');
+    var btnNao = document.getElementById('dialogoCancelar');
+
+    document.getElementById('dialogoTitulo').textContent = opcoes.titulo || 'Confirmar';
+    document.getElementById('dialogoTexto').textContent = opcoes.texto || '';
+    btnOk.textContent = opcoes.botao || 'Confirmar';
+    btnOk.className = opcoes.perigo === false ? 'btn-principal' : 'btn-perigo';
+
+    var focoAnterior = document.activeElement;
+    caixa.classList.remove('escondido');
+    btnOk.focus();
+
+    return new Promise(function (resolve) {
+      function fechar(resposta) {
+        caixa.classList.add('escondido');
+        btnOk.removeEventListener('click', aoSim);
+        btnNao.removeEventListener('click', aoNao);
+        caixa.removeEventListener('click', aoFundo);
+        document.removeEventListener('keydown', aoTeclado, true);
+        if (focoAnterior && focoAnterior.focus) focoAnterior.focus();
+        resolve(resposta);
+      }
+      function aoSim() { fechar(true); }
+      function aoNao() { fechar(false); }
+      function aoFundo(ev) { if (ev.target === caixa) fechar(false); }
+      function aoTeclado(ev) {
+        if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); fechar(false); }
+        else if (ev.key === 'Enter') { ev.preventDefault(); ev.stopPropagation(); fechar(true); }
+      }
+      btnOk.addEventListener('click', aoSim);
+      btnNao.addEventListener('click', aoNao);
+      caixa.addEventListener('click', aoFundo);
+      document.addEventListener('keydown', aoTeclado, true);
+    });
+  }
+
   /* ---------- Utilidades ---------- */
   /* O aviso aceita uma ação ("Desfazer"), e nesse caso fica mais tempo
      na tela para dar tempo de clicar. */
@@ -245,6 +287,7 @@ var App = (function () {
     iniciar: iniciar,
     abrirAba: abrirAba,
     avisar: avisar,
+    confirmar: confirmar,
     baixarArquivo: baixarArquivo,
     conectarImpressora: conectarImpressora,
     imprimirPedido: imprimirPedido,

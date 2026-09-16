@@ -107,6 +107,13 @@ O pedido fica numa **barra fixa no rodapé**: o total e o botão de finalizar
 estão sempre à vista, sem precisar rolar a tela. Toque na barra para abrir e
 conferir os itens.
 
+### Confirmações
+
+Tudo que apaga alguma coisa pede confirmação **dentro do sistema**, não naquela
+janelinha cinza do navegador. `Enter` confirma, `Esc` cancela, clicar fora
+cancela. O aviso diz o que vai acontecer — ao apagar as vendas, por exemplo,
+ele conta quantos pedidos e quanto dinheiro estão em jogo.
+
 ### Errou? Desfaz
 
 Logo depois de finalizar, o aviso na tela traz um botão **Desfazer** por alguns
