@@ -1,5 +1,5 @@
 /* Service worker: guarda o sistema no aparelho para funcionar sem internet */
-var CACHE = 'festa-sbj-v1';
+var CACHE = 'festa-sbj-v3';
 var ARQUIVOS = [
   './',
   './index.html',
@@ -33,14 +33,22 @@ self.addEventListener('activate', function (ev) {
 
 self.addEventListener('fetch', function (ev) {
   if (ev.request.method !== 'GET') return;
+
+  /* Rede primeiro, cache como reserva.
+     Antes era o contrário, e quem já tinha aberto o sistema continuava
+     vendo a versão velha mesmo depois de eu publicar correções — dava
+     para achar que a novidade simplesmente não funcionava. */
   ev.respondWith(
-    caches.match(ev.request).then(function (resposta) {
-      return resposta || fetch(ev.request).then(function (rede) {
+    fetch(ev.request).then(function (rede) {
+      if (rede && rede.status === 200 && rede.type === 'basic') {
         var copia = rede.clone();
         caches.open(CACHE).then(function (c) { c.put(ev.request, copia); });
-        return rede;
-      }).catch(function () {
-        return caches.match('./index.html');
+      }
+      return rede;
+    }).catch(function () {
+      /* sem internet: serve o que estiver guardado */
+      return caches.match(ev.request).then(function (guardado) {
+        return guardado || caches.match('./index.html');
       });
     })
   );
