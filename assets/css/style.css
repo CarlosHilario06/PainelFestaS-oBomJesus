@@ -107,7 +107,7 @@ main{padding:14px;max-width:1400px;margin:0 auto}
   box-shadow:var(--sombra);display:flex;flex-direction:column;
   position:sticky;top:12px;max-height:calc(100vh - 24px);
 }
-@media (max-width:900px){.pdv-carrinho{position:static;max-height:none}}
+
 .carrinho-topo{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 14px;border-bottom:1px solid var(--borda);
@@ -148,9 +148,36 @@ main{padding:14px;max-width:1400px;margin:0 auto}
   border:1px solid var(--borda);background:var(--fundo);border-radius:8px;
   padding:7px 11px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--texto);
 }
-.linha-troco{margin-top:8px;font-size:.95rem;text-align:right}
-.linha-troco strong{font-size:1.15rem;color:var(--azul)}
-.linha-troco.falta strong{color:var(--vermelho)}
+/* O troco é o número que a pessoa fala em voz alta para o cliente:
+   quando existe troco de verdade, ele domina a tela. */
+.linha-troco{
+  margin-top:10px;display:flex;align-items:baseline;justify-content:space-between;
+  gap:10px;padding:8px 12px;border-radius:10px;background:var(--fundo);
+}
+.troco-rotulo{font-size:.8rem;color:var(--texto-suave);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.linha-troco strong{font-size:1.3rem;color:var(--azul);transition:font-size .12s ease}
+.linha-troco.destaque{background:#dbeafe;padding:12px}
+.linha-troco.destaque strong{font-size:2.3rem;line-height:1}
+.linha-troco.falta{background:var(--vermelho-claro)}
+.linha-troco.falta strong{color:var(--vermelho);font-size:1.1rem}
+
+.atalhos-dica{
+  margin:2px 0 0;font-size:.72rem;color:var(--texto-suave);line-height:1.5;text-align:center;
+}
+.atalhos-dica kbd{
+  background:var(--fundo);border:1px solid var(--borda);border-bottom-width:2px;
+  border-radius:4px;padding:1px 5px;font-family:inherit;font-size:.9em;color:var(--texto);
+}
+@media (max-width:900px){.atalhos-dica{display:none}}
+
+/* ===== Barra fixa do celular ===== */
+/* No computador ela não existe; o bloco do celular fica no fim do arquivo. */
+@media (min-width:901px){.barra-resumo{display:none}}
+.aviso-acao{
+  background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:7px;
+  padding:7px 13px;margin-left:12px;font-weight:700;font-size:.85rem;cursor:pointer;
+  font-family:inherit;
+}
 
 /* ===== Botões ===== */
 .btn-principal,.btn-secundario,.btn-perigo{
@@ -188,6 +215,26 @@ main{padding:14px;max-width:1400px;margin:0 auto}
 .check{display:flex;align-items:center;gap:9px;font-size:.9rem;margin:10px 0;cursor:pointer}
 .check input{width:20px;height:20px}
 
+/* ===== Imagem da ficha ===== */
+.logo-area{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+@media (max-width:620px){.logo-area{grid-template-columns:1fr}}
+.logo-preview{
+  border:1px solid var(--borda);border-radius:var(--raio);background:#fff;
+  padding:10px;text-align:center;min-height:120px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+}
+.logo-preview.vazio{color:var(--texto-suave);font-size:.85rem;background:var(--fundo);border-style:dashed}
+.logo-preview img{max-width:100%;image-rendering:pixelated}
+.logo-info{font-size:.7rem;color:var(--texto-suave)}
+.logo-controles input[type=range]{width:100%;max-width:280px}
+.logo-controles .campo{margin-bottom:10px}
+
+/* a imagem impressa na ficha */
+.via .logo{
+  display:block;margin:0 auto 2mm;max-width:100%;
+  image-rendering:pixelated;
+}
+
 /* ===== Listas ===== */
 .lista{display:flex;flex-direction:column}
 .linha{
@@ -204,6 +251,8 @@ main{padding:14px;max-width:1400px;margin:0 auto}
   border:1px solid var(--borda);background:var(--fundo);border-radius:8px;
   padding:8px 11px;font-size:.82rem;cursor:pointer;color:var(--texto);font-weight:600;
 }
+.linha-acoes button.mover{padding:8px 10px;font-size:1rem;line-height:1;min-width:36px}
+.linha-acoes button.mover:disabled{opacity:.3;cursor:not-allowed}
 .linha-acoes button.perigo{color:var(--vermelho);border-color:var(--vermelho-claro);background:var(--vermelho-claro)}
 
 .cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
@@ -282,4 +331,51 @@ main{padding:14px;max-width:1400px;margin:0 auto}
   background:#fff;width:58mm;max-width:100%;margin:0 auto 10px;
   padding:5mm 3mm;box-shadow:0 1px 4px rgba(0,0,0,.18);
   border-bottom:1px dashed #94a3b8;
+}
+
+/* ==========================================================
+   Celular - fica no FIM de propósito.
+   Regras de mesma força valem pela ordem do arquivo: se este
+   bloco ficasse no meio, cada regra escrita depois (.aviso,
+   .barra-resumo...) o desfazia sem ninguém perceber.
+   ========================================================== */
+/* No celular o pedido vira uma gaveta presa no rodapé: o total e o
+   botão de finalizar ficam sempre visíveis, sem precisar rolar a tela. */
+@media (max-width:900px){
+  .pdv-carrinho{
+    position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;
+    border-radius:16px 16px 0 0;border-width:1px 0 0;
+    max-height:85vh;box-shadow:0 -4px 20px rgba(15,23,42,.18);
+  }
+  .barra-resumo{
+    display:flex;align-items:stretch;gap:8px;padding:8px 10px;
+    border-bottom:1px solid var(--borda);
+    /* sem isto, ao abrir a gaveta o conteúdo espreme a barra até sumir */
+    flex:none;
+  }
+  .pdv-carrinho .carrinho-topo{flex:none}
+  .barra-toggle{
+    flex:1;display:flex;align-items:center;gap:8px;background:var(--fundo);
+    border:1px solid var(--borda);border-radius:10px;padding:10px 12px;
+    font-family:inherit;font-size:.9rem;color:var(--texto);cursor:pointer;
+  }
+  .barra-toggle strong{margin-left:auto;font-size:1.1rem;color:var(--verde)}
+  .barra-toggle .seta{transition:transform .18s ease;color:var(--texto-suave)}
+  .pdv-carrinho.aberto .barra-toggle .seta{transform:rotate(180deg)}
+  .barra-finalizar{
+    background:var(--verde);color:#fff;border:none;border-radius:10px;
+    padding:10px 18px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:inherit;
+  }
+  .barra-finalizar:disabled{background:#cbd5e1;color:#94a3b8}
+
+  /* fechada, aparece só a barra */
+  .pdv-carrinho:not(.aberto) .carrinho-topo,
+  .pdv-carrinho:not(.aberto) .itens,
+  .pdv-carrinho:not(.aberto) .resumo{display:none}
+  .pdv-carrinho.aberto .itens{max-height:34vh}
+  .pdv-carrinho.aberto .resumo{max-height:44vh;overflow-y:auto}
+
+  /* espaço para a gaveta não cobrir os produtos */
+  main{padding-bottom:78px}
+  .aviso{bottom:92px}
 }

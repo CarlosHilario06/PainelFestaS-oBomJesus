@@ -126,6 +126,22 @@ var Impressora = (function () {
         for (var i = 0; i < (bloco.n || 1); i++) b.push(0x0A);
         break;
 
+      case 'imagem':
+        /* GS v 0: imprime os pontinhos crus. A impressora entende
+           "tantos bytes por linha, tantas linhas, e lá vão eles". */
+        if (bloco.logo && bloco.logo.dados) {
+          var pontos = Logo.paraBytes(bloco.logo);
+          var porLinha = bloco.logo.largura / 8;
+          var alt = bloco.logo.altura;
+          b = b.concat(CENTRO);
+          b.push(0x1D, 0x76, 0x30, 0x00,
+                 porLinha & 0xFF, (porLinha >> 8) & 0xFF,
+                 alt & 0xFF, (alt >> 8) & 0xFF);
+          for (var k = 0; k < pontos.length; k++) b.push(pontos[k]);
+          b = b.concat(ESQUERDA);
+        }
+        break;
+
       case 'corte':
         /* Espaço para destacar. Com serrinha automática, corta de vez. */
         b.push(0x0A, 0x0A, 0x0A);

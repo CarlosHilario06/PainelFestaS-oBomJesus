@@ -7,10 +7,13 @@ var TelaCaixa = (function () {
   var formaPagamento = 'Dinheiro';
   var categoriaAtiva = 'Todos';
   var textoBusca = '';
+  var quantidadeDigitada = 1;   // de "3 pastel"
 
   var elGrade, elBusca, elCategorias, elItens, elTotal, elPedido;
   var elFormas, elTroco, elRecebido, elValorTroco, elAtalhos;
   var btnFinalizar, btnFinalizarSem, btnLimpar;
+  var elPainel, elBarraToggle, elBarraFinalizar, elResumoQtd, elResumoTotal;
+  var carrinhoAnterior = null;   // guardado para o "Desfazer" do botão Limpar
 
   function iniciar() {
     elGrade = document.getElementById('gradeProdutos');
@@ -27,22 +30,47 @@ var TelaCaixa = (function () {
     btnFinalizar = document.getElementById('btnFinalizar');
     btnFinalizarSem = document.getElementById('btnFinalizarSemImprimir');
     btnLimpar = document.getElementById('btnLimparCarrinho');
+    elPainel = document.getElementById('painelCarrinho');
+    elBarraToggle = document.getElementById('barraToggle');
+    elBarraFinalizar = document.getElementById('barraFinalizar');
+    elResumoQtd = document.getElementById('resumoQtd');
+    elResumoTotal = document.getElementById('resumoTotal');
+
+    elBarraToggle.addEventListener('click', function () {
+      elPainel.classList.toggle('aberto');
+    });
+    elBarraFinalizar.addEventListener('click', function () { finalizar(); });
 
     elBusca.addEventListener('input', function () {
-      textoBusca = elBusca.value.trim().toLowerCase();
+      var bruto = elBusca.value.trim().toLowerCase();
+      var comNumero = bruto.match(/^(\d+)\s*x?\s+(.+)$/);
+      if (comNumero) {
+        quantidadeDigitada = Math.min(99, parseInt(comNumero[1], 10)) || 1;
+        textoBusca = comNumero[2];
+      } else {
+        quantidadeDigitada = 1;
+        textoBusca = bruto;
+      }
       desenharGrade();
     });
     elBusca.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Enter') {
-        ev.preventDefault();
-        var achados = filtrar();
-        if (achados.length > 0) {
-          adicionar(achados[0].id);
-          elBusca.value = '';
-          textoBusca = '';
-          desenharGrade();
-        }
+      if (ev.key !== 'Enter') return;
+      ev.preventDefault();
+
+      /* busca vazia + Enter = finaliza. Deixa fechar a venda sem tirar
+         a mão do teclado: "past" Enter, "refri" Enter, Enter. */
+      if (!elBusca.value.trim()) { finalizar(); return; }
+
+      var achados = filtrar();
+      if (achados.length === 0) {
+        App.avisar('Nenhum produto com esse nome.', 'erro');
+        return;
       }
+      adicionar(achados[0].id, quantidadeDigitada);
+      elBusca.value = '';
+      textoBusca = '';
+      quantidadeDigitada = 1;
+      desenharGrade();
     });
     document.getElementById('limparBusca').addEventListener('click', function () {
       elBusca.value = ''; textoBusca = ''; desenharGrade(); elBusca.focus();
@@ -74,14 +102,38 @@ var TelaCaixa = (function () {
 
     btnLimpar.addEventListener('click', function () {
       if (carrinho.length === 0) return;
-      if (!confirm('Limpar o pedido atual?')) return;
+      carrinhoAnterior = carrinho.slice();
       zerar();
+      App.avisar('Pedido limpo.', null, { texto: 'Desfazer', fn: restaurarCarrinho });
     });
 
     btnFinalizar.addEventListener('click', function () { finalizar(true); });
     btnFinalizarSem.addEventListener('click', function () { finalizar(false); });
 
+    document.addEventListener('keydown', atalhos);
+
+    /* no computador o foco já começa na busca; no celular não,
+       senão o teclado sobe sozinho e come metade da tela */
+    if (window.innerWidth > 900) elBusca.focus();
+
     desenhar();
+  }
+
+  function atalhos(ev) {
+    if (ev.key === 'F2') { ev.preventDefault(); elBusca.focus(); elBusca.select(); return; }
+    if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); finalizar(); return; }
+    if (ev.key === 'Escape') {
+      if (elPainel.classList.contains('aberto')) { elPainel.classList.remove('aberto'); return; }
+      if (elBusca.value) { elBusca.value = ''; textoBusca = ''; quantidadeDigitada = 1; desenharGrade(); }
+      return;
+    }
+    /* digitou uma letra em qualquer lugar: manda para a busca */
+    var campo = document.activeElement && document.activeElement.tagName;
+    if (campo !== 'INPUT' && campo !== 'SELECT' && campo !== 'TEXTAREA' &&
+        ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey &&
+        document.getElementById('tela-caixa').classList.contains('ativa')) {
+      elBusca.focus();
+    }
   }
 
   /* ---------- Produtos na tela ---------- */
@@ -164,14 +216,15 @@ var TelaCaixa = (function () {
     return null;
   }
 
-  function adicionar(id) {
+  function adicionar(id, quantas) {
     var prod = DB.acharProduto(id);
     if (!prod) return;
+    var n = Math.max(1, quantas || 1);
     var item = acharNoCarrinho(id);
     if (item) {
-      item.quantidade += 1;
+      item.quantidade += n;
     } else {
-      carrinho.push({ id: prod.id, nome: prod.nome, preco: prod.preco, quantidade: 1 });
+      carrinho.push({ id: prod.id, nome: prod.nome, preco: prod.preco, quantidade: n });
     }
     desenharCarrinho();
     desenharGrade();
@@ -252,26 +305,51 @@ var TelaCaixa = (function () {
     }
 
     elTotal.textContent = Dinheiro.formatar(total());
+
+    var pecas = carrinho.reduce(function (s, i) { return s + i.quantidade; }, 0);
+    elResumoQtd.textContent = pecas === 0 ? 'Nenhum item'
+      : pecas + (pecas === 1 ? ' item' : ' itens');
+    elResumoTotal.textContent = Dinheiro.formatar(total());
+
     var vazio = carrinho.length === 0;
     btnFinalizar.disabled = vazio;
     btnFinalizarSem.disabled = vazio;
+    elBarraFinalizar.disabled = vazio;
+    if (vazio) elPainel.classList.remove('aberto');
+    atualizarBotoes();
     atualizarTroco();
+  }
+
+  /* Sem impressora conectada o botão não promete imprimir, e o
+     "finalizar sem imprimir" some por ser redundante. */
+  function atualizarBotoes() {
+    var temImpressora = Impressora.conectada();
+    btnFinalizar.textContent = temImpressora ? 'Finalizar e imprimir' : 'Finalizar venda';
+    btnFinalizarSem.classList.toggle('escondido', !temImpressora);
   }
 
   function atualizarTroco() {
     var recebido = Dinheiro.paraCentavos(elRecebido.value);
     var diferenca = recebido - total();
     var caixa = elValorTroco.parentElement;
+    caixa.classList.remove('falta', 'destaque');
     if (recebido === 0) {
       elValorTroco.textContent = Dinheiro.formatar(0);
-      caixa.classList.remove('falta');
     } else if (diferenca < 0) {
       elValorTroco.textContent = 'faltam ' + Dinheiro.formatar(-diferenca);
       caixa.classList.add('falta');
     } else {
       elValorTroco.textContent = Dinheiro.formatar(diferenca);
-      caixa.classList.remove('falta');
+      if (diferenca > 0) caixa.classList.add('destaque');
     }
+  }
+
+  function restaurarCarrinho() {
+    if (!carrinhoAnterior) return;
+    carrinho = carrinhoAnterior.slice();
+    carrinhoAnterior = null;
+    desenharCarrinho();
+    desenharGrade();
   }
 
   function zerar() {
@@ -284,6 +362,7 @@ var TelaCaixa = (function () {
   /* ---------- Finalizar ---------- */
   function finalizar(comImpressao) {
     if (carrinho.length === 0) return;
+    if (comImpressao === undefined) comImpressao = Impressora.conectada();
 
     var valorTotal = total();
     var recebido = Dinheiro.paraCentavos(elRecebido.value);
@@ -303,16 +382,38 @@ var TelaCaixa = (function () {
       troco: formaPagamento === 'Dinheiro' && recebido > 0 ? recebido - valorTotal : 0
     });
 
-    var trocoTexto = venda.troco > 0 ? ' | Troco: ' + Dinheiro.formatar(venda.troco) : '';
-    App.avisar('Pedido #' + venda.pedido + ' registrado.' + trocoTexto, 'ok');
+    var trocoTexto = venda.troco > 0 ? ' · Troco ' + Dinheiro.formatar(venda.troco) : '';
+    App.avisar('Pedido #' + venda.pedido + ' · ' + Dinheiro.formatar(venda.total) + trocoTexto,
+      'ok', { texto: 'Desfazer', fn: desfazerVenda });
 
     zerar();
     TelaVendas.desenhar();
+    if (window.innerWidth > 900) elBusca.focus();
 
     if (comImpressao) App.imprimirPedido(venda);
   }
 
+  /* Desfaz a venda recém-feita: o pedido some, o número volta a valer
+     e os itens voltam para a tela, para corrigir e refazer. */
+  function desfazerVenda() {
+    var venda = DB.desfazerUltimaVenda();
+    if (!venda) return;
+    carrinho = venda.itens.map(function (i) {
+      return { id: i.id, nome: i.nome, preco: i.preco, quantidade: i.quantidade };
+    });
+    formaPagamento = venda.pagamento || 'Dinheiro';
+    Array.prototype.forEach.call(elFormas.children, function (b) {
+      b.classList.toggle('ativa', b.dataset.forma === formaPagamento);
+    });
+    elTroco.style.display = formaPagamento === 'Dinheiro' ? 'block' : 'none';
+    desenharCarrinho();
+    desenharGrade();
+    TelaVendas.desenhar();
+    App.avisar('Pedido #' + venda.pedido + ' desfeito. Os itens voltaram.');
+  }
+
   function desenhar() {
+    atualizarBotoes();
     desenharCategorias();
     desenharGrade();
     desenharCarrinho();

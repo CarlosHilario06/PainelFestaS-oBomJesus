@@ -18,7 +18,7 @@ var DB = (function () {
       codepage: 'cp860',
       imprimirAoFinalizar: 'fichas',
       cortar: false,
-      fallbackNavegador: true
+      fallbackNavegador: false
     }
   };
 
@@ -58,9 +58,29 @@ var DB = (function () {
   /* ---------- Produtos ---------- */
   function listarProdutos() {
     return dados.produtos.slice().sort(function (a, b) {
+      /* quem foi posicionado à mão vem primeiro, na ordem escolhida */
+      var oa = typeof a.ordem === 'number' ? a.ordem : 9999;
+      var ob = typeof b.ordem === 'number' ? b.ordem : 9999;
+      if (oa !== ob) return oa - ob;
       var c = (a.categoria || '').localeCompare(b.categoria || '', 'pt-BR');
       return c !== 0 ? c : a.nome.localeCompare(b.nome, 'pt-BR');
     });
+  }
+
+  /* Move um produto para cima ou para baixo na tela do caixa */
+  function moverProduto(id, direcao) {
+    var lista = listarProdutos();
+    var de = -1;
+    for (var i = 0; i < lista.length; i++) if (lista[i].id === id) de = i;
+    var para = de + direcao;
+    if (de < 0 || para < 0 || para >= lista.length) return false;
+    lista.splice(para, 0, lista.splice(de, 1)[0]);
+    lista.forEach(function (p, indice) {
+      var real = acharProduto(p.id);
+      if (real) real.ordem = indice;
+    });
+    salvar();
+    return true;
   }
 
   function acharProduto(id) {
@@ -125,6 +145,16 @@ var DB = (function () {
       }
     }
     return null;
+  }
+
+  /* Apaga a última venda e devolve os itens, para o "Desfazer" do caixa.
+     Diferente de cancelar: aqui o pedido some e o número é reaproveitado. */
+  function desfazerUltimaVenda() {
+    if (dados.vendas.length === 0) return null;
+    var venda = dados.vendas.pop();
+    dados.proximoPedido = venda.pedido;
+    salvar();
+    return venda;
   }
 
   function listarVendas(dia) {
@@ -210,10 +240,12 @@ var DB = (function () {
     acharProduto: acharProduto,
     salvarProduto: salvarProduto,
     removerProduto: removerProduto,
+    moverProduto: moverProduto,
     categorias: categorias,
     proximoPedido: proximoPedido,
     registrarVenda: registrarVenda,
     cancelarVenda: cancelarVenda,
+    desfazerUltimaVenda: desfazerUltimaVenda,
     listarVendas: listarVendas,
     diaDaVenda: diaDaVenda,
     diasComVenda: diasComVenda,

@@ -84,6 +84,9 @@ var Cupom = (function () {
     venda.itens.forEach(function (item) {
       for (var n = 0; n < item.quantidade; n++) {
         numero++;
+        if (cfg.logo && cfg.logo.dados && cfg.logoNaFicha !== false) {
+          blocos.push({ t: 'imagem', logo: cfg.logo });
+        }
         blocos.push({ t: 'centro', v: cfg.nome || 'FESTA' });
         blocos.push({ t: 'linha', c: '=' });
         blocos.push({ t: 'branco', n: 1 });
@@ -110,6 +113,9 @@ var Cupom = (function () {
     var cfg = DB.config();
     var blocos = [];
 
+    if (cfg.logo && cfg.logo.dados && cfg.logoNaFicha !== false) {
+      blocos.push({ t: 'imagem', logo: cfg.logo });
+    }
     blocos.push({ t: 'centro', v: cfg.nome || 'FESTA' });
     if (cfg.linha2) blocos.push({ t: 'centro', v: cfg.linha2 });
     blocos.push({ t: 'branco', n: 1 });
@@ -188,6 +194,9 @@ var Cupom = (function () {
   function doTeste() {
     var cfg = DB.config();
     return [
+      cfg.logo && cfg.logo.dados
+        ? { t: 'imagem', logo: cfg.logo }
+        : { t: 'branco', n: 0 },
       { t: 'centro', v: cfg.nome || 'FESTA' },
       { t: 'linha', c: '=' },
       { t: 'centro', v: 'TESTE DE IMPRESSAO' },
@@ -242,6 +251,8 @@ var Cupom = (function () {
           saida += new Array(Math.floor(L / 2) + 1).join('- ').slice(0, L) + '\n'; break;
         case 'branco':
           saida += new Array((b.n || 1) + 1).join('\n'); break;
+        case 'imagem':
+          saida += '[imagem]\n'; break;
         case 'corte':
           saida += '\n'; break;
       }
@@ -290,6 +301,12 @@ var Cupom = (function () {
           break;
         case 'branco':
           for (var i = 0; i < (b.n || 1); i++) atual.push('<div>&nbsp;</div>');
+          break;
+        case 'imagem':
+          if (b.logo && b.logo.dados) {
+            atual.push('<div class="c"><img class="logo" alt="" src="' +
+              Logo.paraDataUrl(b.logo) + '"></div>');
+          }
           break;
         case 'corte':
           fechar(); break;

@@ -36,14 +36,23 @@
 
       <div class="pdv-produtos">
         <div class="barra-busca">
-          <input id="busca" type="search" placeholder="Buscar produto... (Enter adiciona)" autocomplete="off">
+          <input id="busca" type="search" placeholder="Buscar produto ou digite 3 pastel..." autocomplete="off">
           <button id="limparBusca" class="btn-icone" type="button" title="Limpar">&times;</button>
         </div>
         <div id="filtroCategorias" class="categorias"></div>
         <div id="gradeProdutos" class="grade"></div>
       </div>
 
-      <aside class="pdv-carrinho">
+      <aside class="pdv-carrinho" id="painelCarrinho">
+        <div class="barra-resumo">
+          <button type="button" class="barra-toggle" id="barraToggle">
+            <span id="resumoQtd">Nenhum item</span>
+            <strong id="resumoTotal">R$ 0,00</strong>
+            <span class="seta">▲</span>
+          </button>
+          <button type="button" class="barra-finalizar" id="barraFinalizar" disabled>Finalizar</button>
+        </div>
+
         <div class="carrinho-topo">
           <h2>Pedido <span id="numeroPedido" class="pedido-num">#1</span></h2>
           <button id="btnLimparCarrinho" class="btn-texto perigo" type="button">Limpar</button>
@@ -73,15 +82,22 @@
             <label for="valorRecebido">Valor recebido (R$)</label>
             <input id="valorRecebido" type="text" inputmode="decimal" placeholder="0,00">
             <div class="atalhos-cedula" id="atalhosCedula"></div>
-            <div class="linha-troco">Troco: <strong id="valorTroco">R$ 0,00</strong></div>
+            <div class="linha-troco" id="linhaTroco">
+              <span class="troco-rotulo">Troco</span>
+              <strong id="valorTroco">R$ 0,00</strong>
+            </div>
           </div>
 
           <button id="btnFinalizar" class="btn-principal" type="button" disabled>
-            Finalizar e imprimir
+            Finalizar venda
           </button>
-          <button id="btnFinalizarSemImprimir" class="btn-secundario" type="button" disabled>
+          <button id="btnFinalizarSemImprimir" class="btn-secundario escondido" type="button" disabled>
             Finalizar sem imprimir
           </button>
+          <p class="atalhos-dica">
+            Digite para buscar · <kbd>Enter</kbd> adiciona · <kbd>Enter</kbd> com a
+            busca vazia finaliza · <kbd>3 pastel</kbd> adiciona 3
+          </p>
         </div>
       </aside>
 
@@ -170,6 +186,33 @@
     </div>
 
     <div class="painel">
+      <h2>Imagem da ficha</h2>
+      <p class="dica">A figura do São Bom Jesus (ou o brasão da paróquia) sai no
+        alto de cada ficha. Desenho de traço, em preto e branco, fica melhor que foto.</p>
+
+      <div class="logo-area">
+        <div id="logoPreview" class="logo-preview vazio">Nenhuma imagem</div>
+        <div class="logo-controles">
+          <div class="acoes-form">
+            <button id="btnEscolherLogo" class="btn-principal" type="button">Escolher imagem</button>
+            <button id="btnRemoverLogo" class="btn-perigo" type="button">Remover</button>
+            <input id="arquivoLogo" type="file" accept="image/*" class="escondido">
+          </div>
+          <div class="campo">
+            <label for="cfgLogoLargura">Tamanho na ficha: <span id="logoLarguraValor">240</span> pontos</label>
+            <input id="cfgLogoLargura" type="range" min="96" max="384" step="8" value="240">
+          </div>
+          <div class="campo">
+            <label for="cfgLogoLimite">Contraste: <span id="logoLimiteValor">160</span></label>
+            <input id="cfgLogoLimite" type="range" min="60" max="230" step="5" value="160">
+            <span class="dica">Arraste se o desenho sair muito apagado ou muito borrado.</span>
+          </div>
+          <label class="check"><input id="cfgLogoNaFicha" type="checkbox" checked> Imprimir a imagem nas fichas</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="painel">
       <h2>Impressora Bluetooth</h2>
       <p class="dica">Use o <strong>Google Chrome</strong> (Windows ou Android). Ligue a impressora, deixe o Bluetooth do aparelho ativo e clique em conectar. O pareamento é feito na própria janela do Chrome.</p>
       <div class="acoes-form">
@@ -233,6 +276,7 @@
 </div>
 
 <script src="assets/js/db.js"></script>
+<script src="assets/js/logo.js"></script>
 <script src="assets/js/impressora.js"></script>
 <script src="assets/js/cupom.js"></script>
 <script src="assets/js/produtos.js"></script>

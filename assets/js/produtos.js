@@ -71,6 +71,12 @@ var TelaProdutos = (function () {
     App.avisar('Produto apagado.');
   }
 
+  function mover(id, direcao) {
+    if (!DB.moverProduto(id, direcao)) return;
+    desenhar();
+    TelaCaixa.desenhar();
+  }
+
   function limparForm() {
     form.reset();
     campoId.value = '';
@@ -95,7 +101,7 @@ var TelaProdutos = (function () {
       return;
     }
 
-    produtos.forEach(function (p) {
+    produtos.forEach(function (p, indice) {
       var linha = document.createElement('div');
       linha.className = 'linha';
 
@@ -116,6 +122,25 @@ var TelaProdutos = (function () {
 
       var acoes = document.createElement('div');
       acoes.className = 'linha-acoes';
+
+      /* subir/descer: deixa a ordem da tela do caixa igual à da barraca */
+      var bSubir = document.createElement('button');
+      bSubir.type = 'button';
+      bSubir.className = 'mover';
+      bSubir.textContent = '↑';
+      bSubir.title = 'Subir';
+      bSubir.disabled = indice === 0;
+      bSubir.addEventListener('click', function () { mover(p.id, -1); });
+      var bDescer = document.createElement('button');
+      bDescer.type = 'button';
+      bDescer.className = 'mover';
+      bDescer.textContent = '↓';
+      bDescer.title = 'Descer';
+      bDescer.disabled = indice === produtos.length - 1;
+      bDescer.addEventListener('click', function () { mover(p.id, 1); });
+      acoes.appendChild(bSubir);
+      acoes.appendChild(bDescer);
+
       var bEditar = document.createElement('button');
       bEditar.type = 'button';
       bEditar.textContent = 'Editar';

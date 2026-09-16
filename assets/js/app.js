@@ -67,6 +67,7 @@ var App = (function () {
     elStatus.textContent = ligada
       ? (Impressora.nomeDispositivo() || 'Impressora conectada')
       : 'Conectar impressora';
+    if (window.TelaCaixa && TelaCaixa.desenhar) TelaCaixa.desenhar();
   }
 
   function conectarImpressora() {
@@ -111,9 +112,11 @@ var App = (function () {
         avisar('Falha ao imprimir: ' + (e.message || 'erro'), 'erro');
         planoB(blocos);
       });
-    } else {
-      avisar('Impressora não conectada.', 'erro');
+    } else if (DB.config().fallbackNavegador !== false) {
+      avisar('Impressora não conectada. Abrindo a impressão do navegador.');
       planoB(blocos);
+    } else {
+      avisar('Impressora não conectada — a venda foi salva mesmo assim.', 'erro');
     }
   }
 
@@ -125,13 +128,32 @@ var App = (function () {
   }
 
   /* ---------- Utilidades ---------- */
-  function avisar(mensagem, tipo) {
-    elAviso.textContent = mensagem;
+  /* O aviso aceita uma ação ("Desfazer"), e nesse caso fica mais tempo
+     na tela para dar tempo de clicar. */
+  function avisar(mensagem, tipo, acao) {
+    elAviso.innerHTML = '';
+    var texto = document.createElement('span');
+    texto.textContent = mensagem;
+    elAviso.appendChild(texto);
+
+    if (acao && acao.fn) {
+      var botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'aviso-acao';
+      botao.textContent = acao.texto || 'Desfazer';
+      botao.addEventListener('click', function () {
+        elAviso.className = 'aviso';
+        clearTimeout(tempoAviso);
+        acao.fn();
+      });
+      elAviso.appendChild(botao);
+    }
+
     elAviso.className = 'aviso mostrar' + (tipo ? ' ' + tipo : '');
     clearTimeout(tempoAviso);
     tempoAviso = setTimeout(function () {
       elAviso.className = 'aviso';
-    }, 3200);
+    }, acao ? 7000 : 3200);
   }
 
   function baixarArquivo(conteudo, nome, tipo) {

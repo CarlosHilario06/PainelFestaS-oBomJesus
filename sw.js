@@ -7,6 +7,7 @@ var ARQUIVOS = [
   './assets/icone.svg',
   './assets/css/style.css',
   './assets/js/db.js',
+  './assets/js/logo.js',
   './assets/js/impressora.js',
   './assets/js/cupom.js',
   './assets/js/produtos.js',

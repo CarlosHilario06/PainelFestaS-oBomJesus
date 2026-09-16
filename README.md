@@ -35,7 +35,19 @@ Doces...) e um ícone. Clique em **Salvar produto**.
 
 Já deixei 12 produtos de exemplo cadastrados. Edite ou apague à vontade.
 
-### 2. Conectar a impressora
+### 2. Colocar a imagem na ficha (opcional)
+
+Aba **Ajustes → Imagem da ficha → Escolher imagem**. O sistema converte o
+desenho para preto e branco e mostra como vai sair. Desenho de traço (contorno)
+fica bem melhor que foto. Os controles de **tamanho** e **contraste** ajustam
+se sair muito apagado ou muito borrado.
+
+### 3. Ordem dos produtos
+
+Na aba **Produtos**, as setas ↑ ↓ mudam a posição. Vale deixar a ordem da tela
+igual à das barracas — quem opera acha por reflexo.
+
+### 4. Conectar a impressora
 
 1. Ligue a impressora e deixe o Bluetooth do computador ligado.
 2. Clique em **Conectar impressora** (no alto da tela, à direita).
@@ -44,7 +56,7 @@ Já deixei 12 produtos de exemplo cadastrados. Edite ou apague à vontade.
 
 Quando a bolinha ficar verde, está pronto.
 
-### 3. Na hora do pedido
+### 5. Na hora do pedido
 
 1. Clique nos produtos — cada clique soma 1 unidade.
 2. Ajuste quantidades com os botões **−** e **+**.
@@ -58,13 +70,37 @@ e 1 refrigerante recebe 3 fichas: entrega cada uma na barraquinha certa.
 Cada ficha traz o nome do produto em letra grande, o preço, o número do
 pedido e a contagem (1/3, 2/3, 3/3), com linha pontilhada para destacar.
 
-Atalho: digite o nome no campo de busca e aperte **Enter** — ele já adiciona.
+### Atalhos de teclado (no computador)
+
+O caixa já abre com o cursor na busca. Dá pra fechar uma venda inteira sem
+tirar a mão do teclado:
+
+| Atalho | O que faz |
+|---|---|
+| digitar o nome + `Enter` | adiciona o produto |
+| `3 pastel` + `Enter` | adiciona **3** pastéis de uma vez (`3x pastel` também vale) |
+| `Enter` com a busca vazia | finaliza a venda |
+| `Ctrl` + `Enter` | finaliza de qualquer lugar da tela |
+| `F2` | volta o cursor para a busca |
+| `Esc` | limpa a busca |
+
+### No celular
+
+O pedido fica numa **barra fixa no rodapé**: o total e o botão de finalizar
+estão sempre à vista, sem precisar rolar a tela. Toque na barra para abrir e
+conferir os itens.
+
+### Errou? Desfaz
+
+Logo depois de finalizar, o aviso na tela traz um botão **Desfazer** por alguns
+segundos: o pedido some do caixa, o número volta a valer e os itens voltam para
+a tela para você corrigir. O botão *Limpar* também pode ser desfeito.
 
 > Em *Ajustes* dá para trocar o que sai ao finalizar: **fichas** (padrão),
 > **só o cupom** da compra, ou **cupom + fichas**. O botão **Ver como fica**
 > mostra na tela, sem gastar papel.
 
-### 4. No fim da noite
+### 6. No fim da noite
 
 Aba **Vendas**:
 
@@ -75,7 +111,7 @@ Aba **Vendas**:
 - dá para **cancelar** um pedido errado (sai do total) e **reimprimir** as
   fichas de um pedido, caso alguma se perca ou o papel acabe no meio.
 
-### 5. Backup — importante!
+### 7. Backup — importante!
 
 Os dados ficam **neste navegador, neste computador**. Se limparem o histórico
 do Chrome, some tudo.
@@ -92,6 +128,7 @@ voltar depois, é **Restaurar backup**.
 | Nome da festa / linha extra / rodapé | O que sai impresso no alto e no pé do cupom |
 | Largura do cupom | 58 mm (padrão, bobina pequena) ou 80 mm (impressora de balcão) |
 | Acentuação | Se sair "cora????o" no papel, troque para CP850 ou "Sem acentos" |
+| Imagem da ficha | A figura do São Bom Jesus (ou o brasão) impressa no alto de cada ficha |
 | O que imprimir ao finalizar | Fichas destacáveis (padrão), só o cupom, ou os dois |
 | Corte de papel | Só ligue se a sua impressora tiver serrinha automática |
 | Plano B do navegador | Se o Bluetooth falhar, abre a janela normal de impressão |
@@ -132,6 +169,7 @@ assets/css/style.css    a aparência
 assets/js/db.js         onde os dados são guardados (localStorage)
 assets/js/impressora.js Bluetooth + ESC/POS (a conversa com a impressora)
 assets/js/cupom.js      monta as fichas, o cupom e o fechamento
+assets/js/logo.js       converte a imagem em pontinhos para a térmica
 assets/js/caixa.js      a tela de venda
 assets/js/produtos.js   o cadastro
 assets/js/vendas.js     relatórios, fechamento e CSV
