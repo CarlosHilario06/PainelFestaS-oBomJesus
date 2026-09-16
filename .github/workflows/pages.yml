@@ -1,0 +1,50 @@
+# Publica o sistema no GitHub Pages a cada push.
+# O passo "configure-pages" com enablement liga o Pages sozinho na
+# primeira execução, sem precisar mexer nas configurações do repositório.
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/relaxed-davinci-pel2ez
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Ligar e configurar o GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Separar os arquivos do site
+        run: |
+          mkdir -p _site
+          cp -r index.html manifest.json sw.js README.md assets _site/
+          touch _site/.nojekyll
+
+      - name: Enviar os arquivos
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publicar
+        id: publicacao
+        uses: actions/deploy-pages@v4
