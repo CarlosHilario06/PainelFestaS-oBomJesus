@@ -3,7 +3,7 @@
    =========================================================== */
 var TelaProdutos = (function () {
 
-  var form, campoId, campoNome, campoPreco, campoCategoria, campoEmoji;
+  var form, campoId, campoNome, campoPreco, campoCategoria;
   var btnCancelar, lista, contador, datalist, titulo;
 
   function iniciar() {
@@ -12,7 +12,6 @@ var TelaProdutos = (function () {
     campoNome = document.getElementById('produtoNome');
     campoPreco = document.getElementById('produtoPreco');
     campoCategoria = document.getElementById('produtoCategoria');
-    campoEmoji = document.getElementById('produtoEmoji');
     btnCancelar = document.getElementById('btnCancelarProduto');
     lista = document.getElementById('listaProdutos');
     contador = document.getElementById('qtdProdutos');
@@ -36,8 +35,7 @@ var TelaProdutos = (function () {
       id: campoId.value || null,
       nome: nome,
       preco: preco,
-      categoria: campoCategoria.value.trim(),
-      emoji: campoEmoji.value.trim()
+      categoria: campoCategoria.value.trim()
     });
 
     App.avisar(campoId.value ? 'Produto atualizado.' : 'Produto cadastrado!', 'ok');
@@ -53,7 +51,6 @@ var TelaProdutos = (function () {
     campoNome.value = p.nome;
     campoPreco.value = Dinheiro.semSimbolo(p.preco);
     campoCategoria.value = p.categoria || '';
-    campoEmoji.value = p.emoji || '';
     titulo.textContent = 'Editando: ' + p.nome;
     btnCancelar.classList.remove('escondido');
     campoNome.focus();
@@ -109,7 +106,7 @@ var TelaProdutos = (function () {
       info.className = 'linha-info';
       var titulo = document.createElement('div');
       titulo.className = 'linha-titulo';
-      titulo.textContent = (p.emoji ? p.emoji + ' ' : '') + p.nome;
+      titulo.textContent = p.nome;
       var sub = document.createElement('div');
       sub.className = 'linha-sub';
       sub.textContent = p.categoria || 'Sem categoria';

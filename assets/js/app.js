@@ -23,6 +23,9 @@ var App = (function () {
       }
     });
 
+    document.getElementById('btnTema').addEventListener('click', alternarTema);
+    mostrarTema();
+
     Impressora.aoMudar(atualizarStatusImpressora);
 
     /* Primeira vez: já deixa produtos de exemplo prontos */
@@ -40,6 +43,30 @@ var App = (function () {
     atualizarCabecalho();
     atualizarStatusImpressora();
     registrarServiceWorker();
+  }
+
+  /* ---------- Tema claro / escuro ---------- */
+  var CHAVE_TEMA = 'festa-sbj:tema';
+
+  function temaEscuro() {
+    return document.documentElement.getAttribute('data-tema') === 'escuro';
+  }
+
+  function alternarTema() {
+    var escuro = !temaEscuro();
+    if (escuro) document.documentElement.setAttribute('data-tema', 'escuro');
+    else document.documentElement.removeAttribute('data-tema');
+    try { localStorage.setItem(CHAVE_TEMA, escuro ? 'escuro' : 'claro'); } catch (e) {}
+    mostrarTema();
+  }
+
+  function mostrarTema() {
+    var escuro = temaEscuro();
+    var botao = document.getElementById('btnTema');
+    botao.textContent = escuro ? 'Modo claro' : 'Modo escuro';
+    botao.title = escuro ? 'Voltar para o tema claro' : 'Trocar para o tema escuro';
+    var cor = document.querySelector('meta[name="theme-color"]');
+    if (cor) cor.setAttribute('content', escuro ? '#191714' : '#f7f5f1');
   }
 
   function abrirAba(nome) {

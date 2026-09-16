@@ -188,9 +188,12 @@ var TelaCaixa = (function () {
       card.type = 'button';
       card.className = 'card-produto';
       card.innerHTML =
-        '<span class="icone">' + (prod.emoji || '🎪') + '</span>' +
+        '<span class="cat"></span>' +
         '<span class="nome"></span>' +
         '<span class="preco"></span>';
+      var cat = card.querySelector('.cat');
+      if (prod.categoria) cat.textContent = prod.categoria;
+      else cat.remove();
       card.querySelector('.nome').textContent = prod.nome;
       card.querySelector('.preco').textContent = Dinheiro.formatar(prod.preco);
       card.addEventListener('click', function () { adicionar(prod.id); });

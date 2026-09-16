@@ -30,8 +30,8 @@ pelo menu do Chrome em *Adicionar à tela inicial*.
 
 ### 1. Antes da festa — cadastrar os produtos
 
-Aba **Produtos**: escreva o nome, o preço, a categoria (Lanches, Bebidas,
-Doces...) e um ícone. Clique em **Salvar produto**.
+Aba **Produtos**: escreva o nome, o preço e a categoria (Lanches, Bebidas,
+Doces...). Clique em **Salvar produto**.
 
 Já deixei 12 produtos de exemplo cadastrados. Edite ou apague à vontade.
 
@@ -42,12 +42,20 @@ desenho para preto e branco e mostra como vai sair. Desenho de traço (contorno)
 fica bem melhor que foto. Os controles de **tamanho** e **contraste** ajustam
 se sair muito apagado ou muito borrado.
 
-### 3. Ordem dos produtos
+### 3. Tema claro ou escuro
+
+O botão **Modo escuro / Modo claro** fica no alto da tela, ao lado da
+impressora. A escolha fica guardada naquele aparelho. Se o celular já estiver
+no modo escuro, o sistema abre escuro sozinho.
+
+As fichas impressas não mudam: papel branco e tinta preta nos dois temas.
+
+### 4. Ordem dos produtos
 
 Na aba **Produtos**, as setas ↑ ↓ mudam a posição. Vale deixar a ordem da tela
 igual à das barracas — quem opera acha por reflexo.
 
-### 4. Conectar a impressora
+### 5. Conectar a impressora
 
 1. Ligue a impressora e deixe o Bluetooth do computador ligado.
 2. Clique em **Conectar impressora** (no alto da tela, à direita).
@@ -56,7 +64,7 @@ igual à das barracas — quem opera acha por reflexo.
 
 Quando a bolinha ficar verde, está pronto.
 
-### 5. Na hora do pedido
+### 6. Na hora do pedido
 
 1. Clique nos produtos — cada clique soma 1 unidade.
 2. Ajuste quantidades com os botões **−** e **+**.
@@ -100,7 +108,7 @@ a tela para você corrigir. O botão *Limpar* também pode ser desfeito.
 > **só o cupom** da compra, ou **cupom + fichas**. O botão **Ver como fica**
 > mostra na tela, sem gastar papel.
 
-### 6. No fim da noite
+### 7. No fim da noite
 
 Aba **Vendas**:
 
@@ -111,7 +119,7 @@ Aba **Vendas**:
 - dá para **cancelar** um pedido errado (sai do total) e **reimprimir** as
   fichas de um pedido, caso alguma se perca ou o papel acabe no meio.
 
-### 7. Backup — importante!
+### 8. Backup — importante!
 
 Os dados ficam **neste navegador, neste computador**. Se limparem o histórico
 do Chrome, some tudo.
@@ -165,7 +173,7 @@ Não tem instalação, nem build, nem servidor. É HTML, CSS e JavaScript puro.
 
 ```
 index.html              a tela
-assets/css/style.css    a aparência
+assets/css/style.css    a aparência (os dois temas saem das mesmas variáveis)
 assets/js/db.js         onde os dados são guardados (localStorage)
 assets/js/impressora.js Bluetooth + ESC/POS (a conversa com a impressora)
 assets/js/cupom.js      monta as fichas, o cupom e o fechamento

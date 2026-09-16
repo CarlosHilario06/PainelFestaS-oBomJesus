@@ -3,11 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1d4ed8">
+<meta name="theme-color" content="#f7f5f1">
 <title>Caixa - Festa São Bom Jesus</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎪</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23a8532f'/><text x='50' y='68' font-size='52' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='%23fff'>SBJ</text></svg>">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>
+/* Aplica o tema salvo ANTES de desenhar a página, senão ela pisca
+   branca por um instante ao abrir no modo escuro. */
+(function () {
+  try {
+    var t = localStorage.getItem('festa-sbj:tema');
+    if (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) t = 'escuro';
+    if (t === 'escuro') document.documentElement.setAttribute('data-tema', 'escuro');
+  } catch (e) { /* navegador sem localStorage: segue no tema claro */ }
+})();
+</script>
 </head>
 <body>
 
@@ -16,9 +27,12 @@
     <strong id="tituloFesta">Festa São Bom Jesus</strong>
     <span id="subtituloFesta">Caixa</span>
   </div>
-  <button id="btnImpressora" class="chip chip-off" type="button" title="Conectar impressora Bluetooth">
-    <span class="bolinha"></span><span id="statusImpressora">Impressora desconectada</span>
-  </button>
+  <div class="topo-acoes">
+    <button id="btnTema" class="btn-tema" type="button">Modo escuro</button>
+    <button id="btnImpressora" class="chip chip-off" type="button" title="Conectar impressora Bluetooth">
+      <span class="bolinha"></span><span id="statusImpressora">Impressora desconectada</span>
+    </button>
+  </div>
 </header>
 
 <nav class="abas" role="tablist">
@@ -122,10 +136,6 @@
           <label for="produtoCategoria">Categoria</label>
           <input id="produtoCategoria" type="text" list="listaCategorias" placeholder="Ex.: Lanches" maxlength="20">
           <datalist id="listaCategorias"></datalist>
-        </div>
-        <div class="campo campo-curto">
-          <label for="produtoEmoji">Ícone</label>
-          <input id="produtoEmoji" type="text" placeholder="🌭" maxlength="4">
         </div>
         <div class="acoes-form">
           <button type="submit" class="btn-principal">Salvar produto</button>

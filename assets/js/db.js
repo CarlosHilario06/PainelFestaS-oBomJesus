@@ -97,7 +97,6 @@ var DB = (function () {
         atual.nome = p.nome;
         atual.preco = p.preco;
         atual.categoria = p.categoria;
-        atual.emoji = p.emoji;
       }
     } else {
       p.id = novoId();
@@ -213,22 +212,22 @@ var DB = (function () {
   function semearExemplos() {
     if (dados.produtos.length > 0) return false;
     var exemplos = [
-      ['Cachorro-quente', 800, 'Lanches', '🌭'],
-      ['Pastel', 700, 'Lanches', '🥟'],
-      ['Espetinho', 1000, 'Lanches', '🍢'],
-      ['Pipoca', 500, 'Lanches', '🍿'],
-      ['Milho verde', 600, 'Lanches', '🌽'],
-      ['Refrigerante lata', 500, 'Bebidas', '🥤'],
-      ['Água mineral', 300, 'Bebidas', '💧'],
-      ['Suco natural', 500, 'Bebidas', '🧃'],
-      ['Café', 200, 'Bebidas', '☕'],
-      ['Bolo (fatia)', 500, 'Doces', '🍰'],
-      ['Doce caseiro', 300, 'Doces', '🍬'],
-      ['Algodão doce', 500, 'Doces', '🍭']
+      ['Cachorro-quente', 800, 'Lanches'],
+      ['Pastel', 700, 'Lanches'],
+      ['Espetinho', 1000, 'Lanches'],
+      ['Pipoca', 500, 'Lanches'],
+      ['Milho verde', 600, 'Lanches'],
+      ['Refrigerante lata', 500, 'Bebidas'],
+      ['Água mineral', 300, 'Bebidas'],
+      ['Suco natural', 500, 'Bebidas'],
+      ['Café', 200, 'Bebidas'],
+      ['Bolo (fatia)', 500, 'Doces'],
+      ['Doce caseiro', 300, 'Doces'],
+      ['Algodão doce', 500, 'Doces']
     ];
     exemplos.forEach(function (e) {
       dados.produtos.push({
-        id: novoId(), nome: e[0], preco: e[1], categoria: e[2], emoji: e[3]
+        id: novoId(), nome: e[0], preco: e[1], categoria: e[2]
       });
     });
     salvar();
