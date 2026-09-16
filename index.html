@@ -175,6 +175,7 @@
       <div class="acoes-form">
         <button id="btnConectar" class="btn-principal" type="button">Conectar impressora</button>
         <button id="btnTeste" class="btn-secundario" type="button">Imprimir teste</button>
+        <button id="btnPrevia" class="btn-secundario" type="button">Ver como fica</button>
         <button id="btnDesconectar" class="btn-secundario" type="button">Desconectar</button>
       </div>
       <div class="campo campo-curto">
@@ -193,10 +194,11 @@
         </select>
       </div>
       <div class="campo campo-curto">
-        <label for="cfgVias">Vias por pedido</label>
-        <select id="cfgVias">
-          <option value="1">1 via (cliente)</option>
-          <option value="2">2 vias (cliente + barraca)</option>
+        <label for="cfgAoFinalizar">O que imprimir ao finalizar</label>
+        <select id="cfgAoFinalizar">
+          <option value="fichas">Fichas destacáveis (uma por item)</option>
+          <option value="cupom">Só o cupom da compra</option>
+          <option value="ambos">Cupom + fichas</option>
         </select>
       </div>
       <label class="check"><input id="cfgCortar" type="checkbox"> Enviar comando de corte de papel</label>
@@ -219,6 +221,16 @@
 
 <div id="aviso" class="aviso"></div>
 <div id="areaImpressaoNavegador" class="cupom-navegador"></div>
+
+<div id="previa" class="previa escondido">
+  <div class="previa-caixa">
+    <div class="previa-topo">
+      <strong>Como vai sair no papel</strong>
+      <button id="fecharPrevia" class="btn-icone" type="button">&times;</button>
+    </div>
+    <div id="previaConteudo" class="previa-papel"></div>
+  </div>
+</div>
 
 <script src="assets/js/db.js"></script>
 <script src="assets/js/impressora.js"></script>

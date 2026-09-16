@@ -16,7 +16,7 @@ var DB = (function () {
       rodape: 'Deus abencoe! Obrigado.',
       largura: 32,
       codepage: 'cp860',
-      vias: 1,
+      imprimirAoFinalizar: 'fichas',
       cortar: false,
       fallbackNavegador: true
     }

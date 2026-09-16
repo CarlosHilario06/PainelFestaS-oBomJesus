@@ -87,34 +87,40 @@ var App = (function () {
     });
   }
 
-  /* Imprime o cupom de um pedido, respeitando o número de vias configurado */
+  /* Monta o que sai ao finalizar o pedido: fichas para destacar,
+     o cupom do cliente, ou os dois — conforme os Ajustes. */
+  function blocosDoPedido(venda, marca) {
+    var modo = DB.config().imprimirAoFinalizar || 'fichas';
+    var blocos = [];
+    if (modo !== 'fichas') blocos = blocos.concat(Cupom.doPedido(venda, marca || null));
+    if (modo !== 'cupom') blocos = blocos.concat(Cupom.doFichas(venda, marca || null));
+    return blocos;
+  }
+
   function imprimirPedido(venda, marca) {
-    var cfg = DB.config();
-    var vias = marca ? 1 : (cfg.vias || 1);
-    var texto = Cupom.doPedido(venda, marca || null);
-    enviarParaImpressora(texto, vias, 'Pedido #' + venda.pedido);
+    enviarParaImpressora(blocosDoPedido(venda, marca), 'Pedido #' + venda.pedido);
   }
 
   /* Tenta o Bluetooth; se não der, cai para a impressão do navegador */
-  function enviarParaImpressora(texto, vias, rotulo) {
+  function enviarParaImpressora(blocos, rotulo) {
     if (Impressora.conectada()) {
-      Impressora.imprimir(texto, vias).then(function () {
+      Impressora.imprimir(blocos, 1).then(function () {
         avisar((rotulo || 'Cupom') + ' impresso.', 'ok');
       }).catch(function (e) {
         console.error(e);
         avisar('Falha ao imprimir: ' + (e.message || 'erro'), 'erro');
-        planoB(texto);
+        planoB(blocos);
       });
     } else {
       avisar('Impressora não conectada.', 'erro');
-      planoB(texto);
+      planoB(blocos);
     }
   }
 
-  function planoB(texto) {
+  function planoB(blocos) {
     if (DB.config().fallbackNavegador === false) return;
     setTimeout(function () {
-      Impressora.imprimirPeloNavegador(texto);
+      Impressora.imprimirPeloNavegador(blocos);
     }, 400);
   }
 
@@ -153,6 +159,7 @@ var App = (function () {
     baixarArquivo: baixarArquivo,
     conectarImpressora: conectarImpressora,
     imprimirPedido: imprimirPedido,
+    blocosDoPedido: blocosDoPedido,
     enviarParaImpressora: enviarParaImpressora,
     atualizarCabecalho: atualizarCabecalho
   };

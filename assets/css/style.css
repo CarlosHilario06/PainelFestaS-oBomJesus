@@ -224,14 +224,51 @@ main{padding:14px;max-width:1400px;margin:0 auto}
 .aviso.erro{background:var(--vermelho)}
 .aviso.ok{background:var(--verde)}
 
-/* ===== Impressão pelo navegador (plano B) ===== */
+/* ===== Papel: pré-visualização na tela e impressão pelo navegador ===== */
+/* A mesma aparência serve para os dois, por isso as classes são comuns.
+   32 colunas de Courier cabem em 58mm com a fonte em 7.5pt. */
+.via{
+  font-family:'Courier New',Courier,monospace;
+  font-size:7.5pt;line-height:1.35;color:#000;
+  page-break-inside:avoid;break-inside:avoid;
+  padding-bottom:4mm;margin-bottom:4mm;
+  border-bottom:1px dashed #555;
+}
+.via:last-child{border-bottom:none;margin-bottom:0}
+.via .c{text-align:center}
+.via .n{font-weight:700}
+.via .g{font-weight:700;font-size:15pt;line-height:1.15;letter-spacing:-.5px}
+.via .r{white-space:pre;letter-spacing:0}
+.via .ld{display:flex;justify-content:space-between;gap:6px}
+.via .ld span:last-child{white-space:nowrap}
+
 .cupom-navegador{display:none}
+
 @media print{
   body>*{display:none !important}
-  .cupom-navegador{
-    display:block !important;width:58mm;margin:0;padding:0;
-    font-family:'Courier New',monospace;font-size:10pt;line-height:1.25;
-    white-space:pre-wrap;color:#000;
-  }
+  .cupom-navegador{display:block !important;width:100%;margin:0;padding:0}
   @page{margin:3mm;size:58mm auto}
+}
+
+/* ===== Janela de pré-visualização ===== */
+.previa{
+  position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.previa.escondido{display:none !important}
+.previa-caixa{
+  background:var(--papel);border-radius:var(--raio);box-shadow:var(--sombra);
+  width:100%;max-width:420px;max-height:88vh;display:flex;flex-direction:column;
+}
+.previa-topo{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-bottom:1px solid var(--borda);
+}
+.previa-papel{
+  overflow-y:auto;padding:14px;background:#f8fafc;
+}
+.previa-papel .via{
+  background:#fff;width:58mm;max-width:100%;margin:0 auto 10px;
+  padding:5mm 3mm;box-shadow:0 1px 4px rgba(0,0,0,.18);
+  border-bottom:1px dashed #94a3b8;
 }

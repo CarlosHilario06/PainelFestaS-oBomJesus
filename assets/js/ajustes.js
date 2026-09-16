@@ -12,7 +12,7 @@ var TelaAjustes = (function () {
       rodape: document.getElementById('cfgRodape'),
       largura: document.getElementById('cfgLargura'),
       codepage: document.getElementById('cfgCodepage'),
-      vias: document.getElementById('cfgVias'),
+      aoFinalizar: document.getElementById('cfgAoFinalizar'),
       cortar: document.getElementById('cfgCortar'),
       fallback: document.getElementById('cfgFallback')
     };
@@ -32,6 +32,11 @@ var TelaAjustes = (function () {
       App.avisar('Impressora desconectada.');
     });
     document.getElementById('btnTeste').addEventListener('click', imprimirTeste);
+    document.getElementById('btnPrevia').addEventListener('click', verPrevia);
+    document.getElementById('fecharPrevia').addEventListener('click', fecharPrevia);
+    document.getElementById('previa').addEventListener('click', function (ev) {
+      if (ev.target.id === 'previa') fecharPrevia();
+    });
 
     document.getElementById('btnBackup').addEventListener('click', baixarBackup);
     document.getElementById('btnRestaurar').addEventListener('click', function () {
@@ -48,7 +53,7 @@ var TelaAjustes = (function () {
     campos.rodape.value = c.rodape || '';
     campos.largura.value = String(c.largura || 32);
     campos.codepage.value = c.codepage || 'cp860';
-    campos.vias.value = String(c.vias || 1);
+    campos.aoFinalizar.value = c.imprimirAoFinalizar || 'fichas';
     campos.cortar.checked = !!c.cortar;
     campos.fallback.checked = c.fallbackNavegador !== false;
   }
@@ -60,7 +65,7 @@ var TelaAjustes = (function () {
       rodape: campos.rodape.value.trim(),
       largura: parseInt(campos.largura.value, 10) || 32,
       codepage: campos.codepage.value,
-      vias: parseInt(campos.vias.value, 10) || 1,
+      imprimirAoFinalizar: campos.aoFinalizar.value,
       cortar: campos.cortar.checked,
       fallbackNavegador: campos.fallback.checked
     });
@@ -68,16 +73,31 @@ var TelaAjustes = (function () {
   }
 
   function imprimirTeste() {
-    var t = '';
-    t += Cupom.centro(DB.config().nome || 'FESTA');
-    t += Cupom.centro('TESTE DE IMPRESSAO');
-    t += Cupom.linha('=');
-    t += Cupom.esquerdaDireita('Acentuacao', 'ç ã é í ô ú');
-    t += Cupom.esquerdaDireita('Exemplo', '1 x 8,00');
-    t += Cupom.linha('-');
-    t += Cupom.esquerdaDireita('TOTAL', 'R$ 8,00');
-    t += Cupom.centro('Se leu isso, esta pronto!');
-    App.enviarParaImpressora(t, 1, 'Teste');
+    App.enviarParaImpressora(Cupom.doTeste(), 'Teste');
+  }
+
+  /* Mostra na tela como o papel vai sair, com um pedido de exemplo */
+  function verPrevia() {
+    var exemplo = {
+      pedido: 12,
+      data: new Date().toISOString(),
+      pagamento: 'Dinheiro',
+      recebido: 3000,
+      troco: 700,
+      total: 2300,
+      itens: [
+        { nome: 'Cachorro-quente', preco: 800, quantidade: 2 },
+        { nome: 'Refrigerante lata', preco: 500, quantidade: 1 },
+        { nome: 'Pastel', preco: 700, quantidade: 1 }
+      ]
+    };
+    document.getElementById('previaConteudo').innerHTML =
+      Cupom.paraHtml(App.blocosDoPedido(exemplo, null));
+    document.getElementById('previa').classList.remove('escondido');
+  }
+
+  function fecharPrevia() {
+    document.getElementById('previa').classList.add('escondido');
   }
 
   function baixarBackup() {

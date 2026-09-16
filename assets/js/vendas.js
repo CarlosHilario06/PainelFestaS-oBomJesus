@@ -19,8 +19,8 @@ var TelaVendas = (function () {
 
     document.getElementById('btnImprimirFechamento').addEventListener('click', function () {
       var dia = diaEscolhido || '';
-      var texto = Cupom.doFechamento(calcularResumo(dia), dia || 'Todos os dias');
-      App.enviarParaImpressora(texto, 1, 'Fechamento');
+      var blocos = Cupom.doFechamento(calcularResumo(dia), dia || 'Todos os dias');
+      App.enviarParaImpressora(blocos, 'Fechamento');
     });
 
     document.getElementById('btnExportarCsv').addEventListener('click', exportarCsv);
@@ -175,7 +175,7 @@ var TelaVendas = (function () {
       acoes.className = 'linha-acoes';
       var bReimprimir = document.createElement('button');
       bReimprimir.type = 'button';
-      bReimprimir.textContent = '2ª via';
+      bReimprimir.textContent = 'Reimprimir';
       bReimprimir.addEventListener('click', function () { App.imprimirPedido(v, 'SEGUNDA VIA'); });
       acoes.appendChild(bReimprimir);
 

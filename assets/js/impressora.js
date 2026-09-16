@@ -66,16 +66,86 @@ var Impressora = (function () {
     return saida;
   }
 
-  /* Monta o pacote completo: inicializa, imprime, avança papel e corta */
-  function montarPacote(texto, cfg) {
-    var bytes = [0x1B, 0x40]; // ESC @ = reset
-    if (SELETOR[cfg.codepage]) {
-      bytes.push(0x1B, 0x74, SELETOR[cfg.codepage]); // ESC t n
+  /* ---------- Comandos ESC/POS ---------- */
+  var ESQUERDA = [0x1B, 0x61, 0x00];
+  var CENTRO   = [0x1B, 0x61, 0x01];
+  var DOBRADO  = [0x1D, 0x21, 0x11];   // largura e altura em dobro
+  var NORMAL   = [0x1D, 0x21, 0x00];
+  var NEGRITO  = [0x1B, 0x45, 0x01];
+  var SEM_NEGRITO = [0x1B, 0x45, 0x00];
+  var CORTAR   = [0x1D, 0x56, 0x42, 0x00];
+
+  function repetir(caractere, vezes) {
+    return new Array(vezes + 1).join(caractere);
+  }
+
+  /* Traduz um bloco do cupom nos bytes que a impressora entende */
+  function bytesDoBloco(bloco, cfg) {
+    var L = cfg.largura || 32;
+    var b = [];
+    function escrever(txt) {
+      b = b.concat(paraBytes(String(txt), cfg.codepage));
+      b.push(0x0A);
     }
-    bytes.push(0x1B, 0x61, 0x00); // alinhar à esquerda
-    bytes = bytes.concat(paraBytes(texto, cfg.codepage));
-    bytes.push(0x0A, 0x0A, 0x0A, 0x0A); // avança papel
-    if (cfg.cortar) bytes.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0 = corte
+
+    switch (bloco.t) {
+      case 'centro':
+        b = b.concat(CENTRO); escrever(bloco.v); b = b.concat(ESQUERDA);
+        break;
+
+      case 'negrito':
+        b = b.concat(CENTRO, NEGRITO); escrever(bloco.v);
+        b = b.concat(SEM_NEGRITO, ESQUERDA);
+        break;
+
+      case 'grande':
+        b = b.concat(CENTRO, DOBRADO); escrever(bloco.v);
+        b = b.concat(NORMAL, ESQUERDA);
+        break;
+
+      case 'txt':
+        escrever(String(bloco.v).slice(0, L));
+        break;
+
+      case 'ld':
+        var e = String(bloco.e), d = String(bloco.d);
+        var sobra = L - d.length;
+        if (e.length > sobra - 1) e = e.slice(0, Math.max(0, sobra - 1));
+        escrever(e + repetir(' ', Math.max(1, L - e.length - d.length)) + d);
+        break;
+
+      case 'linha':
+        escrever(repetir(bloco.c || '-', L));
+        break;
+
+      case 'tracejado':
+        escrever(repetir('- ', Math.floor(L / 2)).slice(0, L));
+        break;
+
+      case 'branco':
+        for (var i = 0; i < (bloco.n || 1); i++) b.push(0x0A);
+        break;
+
+      case 'corte':
+        /* Espaço para destacar. Com serrinha automática, corta de vez. */
+        b.push(0x0A, 0x0A, 0x0A);
+        if (cfg.cortar) b = b.concat(CORTAR);
+        else b.push(0x0A);
+        break;
+    }
+    return b;
+  }
+
+  /* Monta o pacote completo de um documento (lista de blocos) */
+  function montarPacote(blocos, cfg) {
+    var bytes = [0x1B, 0x40];                       // ESC @ = reiniciar
+    if (SELETOR[cfg.codepage]) {
+      bytes.push(0x1B, 0x74, SELETOR[cfg.codepage]); // ESC t n = acentuação
+    }
+    bytes = bytes.concat(ESQUERDA);
+    blocos.forEach(function (bloco) {
+      bytes = bytes.concat(bytesDoBloco(bloco, cfg));
+    });
     return new Uint8Array(bytes);
   }
 
@@ -159,13 +229,13 @@ var Impressora = (function () {
     });
   }
 
-  function imprimir(texto, vias) {
+  function imprimir(blocos, vias) {
     var cfg = DB.config();
     var quantas = vias || 1;
     if (!conectada()) {
       return Promise.reject(new Error('Impressora não conectada.'));
     }
-    var pacote = montarPacote(texto, cfg);
+    var pacote = montarPacote(blocos, cfg);
     var fila = Promise.resolve();
     for (var i = 0; i < quantas; i++) {
       fila = fila.then(function () { return enviarPedacos(pacote, 0); });
@@ -174,9 +244,9 @@ var Impressora = (function () {
   }
 
   /* ---------- Plano B: impressão pelo navegador ---------- */
-  function imprimirPeloNavegador(texto) {
+  function imprimirPeloNavegador(blocos) {
     var area = document.getElementById('areaImpressaoNavegador');
-    area.textContent = texto;
+    area.innerHTML = Cupom.paraHtml(blocos);
     window.print();
   }
 

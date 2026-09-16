@@ -2,7 +2,8 @@
 
 Sistema simples de caixa (PDV) para as festas da igreja: você cadastra os
 produtos uma vez, e na hora do pedido é só **clicar no produto → Finalizar →
-o cupom sai na impressora Bluetooth**.
+saem as fichas na impressora Bluetooth**, uma para cada item, para a pessoa
+destacar e entregar em cada barraquinha.
 
 Funciona no navegador, **sem internet** depois de aberto e **sem mensalidade**.
 Os dados ficam guardados no próprio aparelho.
@@ -52,7 +53,16 @@ Quando a bolinha ficar verde, está pronto.
    (ou toque nos atalhos R$ 10, R$ 20, R$ 50...).
 5. Clique em **Finalizar e imprimir**.
 
+Saem as **fichas destacáveis**, uma por item. Quem comprou 2 cachorros-quentes
+e 1 refrigerante recebe 3 fichas: entrega cada uma na barraquinha certa.
+Cada ficha traz o nome do produto em letra grande, o preço, o número do
+pedido e a contagem (1/3, 2/3, 3/3), com linha pontilhada para destacar.
+
 Atalho: digite o nome no campo de busca e aperte **Enter** — ele já adiciona.
+
+> Em *Ajustes* dá para trocar o que sai ao finalizar: **fichas** (padrão),
+> **só o cupom** da compra, ou **cupom + fichas**. O botão **Ver como fica**
+> mostra na tela, sem gastar papel.
 
 ### 4. No fim da noite
 
@@ -62,7 +72,8 @@ Aba **Vendas**:
 - **Imprimir fechamento** tira o resumo do caixa em papel, com linha para
   assinatura de quem conferiu;
 - **Exportar planilha (CSV)** baixa tudo para abrir no Excel;
-- dá para **cancelar** um pedido errado (sai do total) e reimprimir a **2ª via**.
+- dá para **cancelar** um pedido errado (sai do total) e **reimprimir** as
+  fichas de um pedido, caso alguma se perca ou o papel acabe no meio.
 
 ### 5. Backup — importante!
 
@@ -81,7 +92,7 @@ voltar depois, é **Restaurar backup**.
 | Nome da festa / linha extra / rodapé | O que sai impresso no alto e no pé do cupom |
 | Largura do cupom | 58 mm (padrão, bobina pequena) ou 80 mm (impressora de balcão) |
 | Acentuação | Se sair "cora????o" no papel, troque para CP850 ou "Sem acentos" |
-| Vias por pedido | 2 vias imprime uma para o cliente e uma para a barraca entregar |
+| O que imprimir ao finalizar | Fichas destacáveis (padrão), só o cupom, ou os dois |
 | Corte de papel | Só ligue se a sua impressora tiver serrinha automática |
 | Plano B do navegador | Se o Bluetooth falhar, abre a janela normal de impressão |
 
@@ -100,7 +111,11 @@ Acentuação → teste **CP850**; se continuar, use **Sem acentos**.
 
 **Caiu a conexão no meio da festa** — clique no botão da impressora lá em cima
 para reconectar. **Nenhuma venda se perde**: elas são salvas antes de imprimir,
-e você reimprime pela aba Vendas em "2ª via".
+e você reimprime as fichas pela aba Vendas, no botão "Reimprimir".
+
+**As fichas saem grudadas / cortam no lugar errado** — se a sua impressora tem
+serrinha automática, ligue *Corte de papel* em Ajustes. Se não tem, ela deixa
+uma linha pontilhada e um espaço para destacar à mão.
 
 **Acabou a bateria do computador / fechou sem querer** — abra de novo. Está
 tudo lá, inclusive a numeração dos pedidos.
@@ -116,7 +131,7 @@ index.html              a tela
 assets/css/style.css    a aparência
 assets/js/db.js         onde os dados são guardados (localStorage)
 assets/js/impressora.js Bluetooth + ESC/POS (a conversa com a impressora)
-assets/js/cupom.js      o desenho do cupom em texto
+assets/js/cupom.js      monta as fichas, o cupom e o fechamento
 assets/js/caixa.js      a tela de venda
 assets/js/produtos.js   o cadastro
 assets/js/vendas.js     relatórios, fechamento e CSV
@@ -127,3 +142,9 @@ sw.js / manifest.json   fazem funcionar offline e instalar como aplicativo
 
 Todo valor em dinheiro é guardado em **centavos** (número inteiro), justamente
 para o caixa nunca fechar com diferença de um centavo por arredondamento.
+
+O que vai para o papel não é texto solto: `cupom.js` devolve uma lista de
+**blocos** (`grande`, `negrito`, `linha`, `corte`...) e quem imprime traduz
+cada bloco — em comandos ESC/POS na impressora Bluetooth, ou em HTML na
+pré-visualização e na impressão pelo navegador. Assim as duas saídas nunca
+saem diferentes uma da outra.
