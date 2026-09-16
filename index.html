@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>Caixa - Festa São Bom Jesus</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎪</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-titulo">
+    <strong id="tituloFesta">Festa São Bom Jesus</strong>
+    <span id="subtituloFesta">Caixa</span>
+  </div>
+  <button id="btnImpressora" class="chip chip-off" type="button" title="Conectar impressora Bluetooth">
+    <span class="bolinha"></span><span id="statusImpressora">Impressora desconectada</span>
+  </button>
+</header>
+
+<nav class="abas" role="tablist">
+  <button class="aba ativa" data-aba="caixa" type="button">Caixa</button>
+  <button class="aba" data-aba="produtos" type="button">Produtos</button>
+  <button class="aba" data-aba="vendas" type="button">Vendas</button>
+  <button class="aba" data-aba="ajustes" type="button">Ajustes</button>
+</nav>
+
+<main>
+
+  <!-- ====================== CAIXA ====================== -->
+  <section id="tela-caixa" class="tela ativa">
+    <div class="pdv">
+
+      <div class="pdv-produtos">
+        <div class="barra-busca">
+          <input id="busca" type="search" placeholder="Buscar produto... (Enter adiciona)" autocomplete="off">
+          <button id="limparBusca" class="btn-icone" type="button" title="Limpar">&times;</button>
+        </div>
+        <div id="filtroCategorias" class="categorias"></div>
+        <div id="gradeProdutos" class="grade"></div>
+      </div>
+
+      <aside class="pdv-carrinho">
+        <div class="carrinho-topo">
+          <h2>Pedido <span id="numeroPedido" class="pedido-num">#1</span></h2>
+          <button id="btnLimparCarrinho" class="btn-texto perigo" type="button">Limpar</button>
+        </div>
+
+        <div id="itensCarrinho" class="itens">
+          <p class="vazio">Toque nos produtos para adicionar à compra.</p>
+        </div>
+
+        <div class="resumo">
+          <div class="linha-total">
+            <span>Total</span>
+            <strong id="totalCarrinho">R$ 0,00</strong>
+          </div>
+
+          <div class="pagamento">
+            <label>Pagamento</label>
+            <div id="formasPagamento" class="formas">
+              <button class="forma ativa" data-forma="Dinheiro" type="button">Dinheiro</button>
+              <button class="forma" data-forma="PIX" type="button">PIX</button>
+              <button class="forma" data-forma="Cartão" type="button">Cartão</button>
+              <button class="forma" data-forma="Ficha" type="button">Ficha</button>
+            </div>
+          </div>
+
+          <div id="areaTroco" class="troco">
+            <label for="valorRecebido">Valor recebido (R$)</label>
+            <input id="valorRecebido" type="text" inputmode="decimal" placeholder="0,00">
+            <div class="atalhos-cedula" id="atalhosCedula"></div>
+            <div class="linha-troco">Troco: <strong id="valorTroco">R$ 0,00</strong></div>
+          </div>
+
+          <button id="btnFinalizar" class="btn-principal" type="button" disabled>
+            Finalizar e imprimir
+          </button>
+          <button id="btnFinalizarSemImprimir" class="btn-secundario" type="button" disabled>
+            Finalizar sem imprimir
+          </button>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- ====================== PRODUTOS ====================== -->
+  <section id="tela-produtos" class="tela">
+    <div class="painel">
+      <h2 id="tituloFormProduto">Cadastrar produto</h2>
+      <form id="formProduto" class="form-produto" autocomplete="off">
+        <input type="hidden" id="produtoId">
+        <div class="campo">
+          <label for="produtoNome">Nome</label>
+          <input id="produtoNome" type="text" placeholder="Ex.: Cachorro-quente" required maxlength="40">
+        </div>
+        <div class="campo campo-curto">
+          <label for="produtoPreco">Preço (R$)</label>
+          <input id="produtoPreco" type="text" inputmode="decimal" placeholder="0,00" required>
+        </div>
+        <div class="campo campo-curto">
+          <label for="produtoCategoria">Categoria</label>
+          <input id="produtoCategoria" type="text" list="listaCategorias" placeholder="Ex.: Lanches" maxlength="20">
+          <datalist id="listaCategorias"></datalist>
+        </div>
+        <div class="campo campo-curto">
+          <label for="produtoEmoji">Ícone</label>
+          <input id="produtoEmoji" type="text" placeholder="🌭" maxlength="4">
+        </div>
+        <div class="acoes-form">
+          <button type="submit" class="btn-principal">Salvar produto</button>
+          <button type="button" id="btnCancelarProduto" class="btn-secundario escondido">Cancelar edição</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="painel">
+      <div class="painel-topo">
+        <h2>Produtos cadastrados (<span id="qtdProdutos">0</span>)</h2>
+      </div>
+      <div id="listaProdutos" class="lista"></div>
+    </div>
+  </section>
+
+  <!-- ====================== VENDAS ====================== -->
+  <section id="tela-vendas" class="tela">
+    <div class="painel">
+      <div class="painel-topo">
+        <h2>Resumo do caixa</h2>
+        <select id="filtroDia"></select>
+      </div>
+      <div id="cartoesResumo" class="cartoes"></div>
+      <div class="acoes-form">
+        <button id="btnImprimirFechamento" class="btn-principal" type="button">Imprimir fechamento</button>
+        <button id="btnExportarCsv" class="btn-secundario" type="button">Exportar planilha (CSV)</button>
+      </div>
+    </div>
+
+    <div class="painel">
+      <h2>Mais vendidos</h2>
+      <div id="ranking" class="lista"></div>
+    </div>
+
+    <div class="painel">
+      <h2>Pedidos</h2>
+      <div id="listaVendas" class="lista"></div>
+    </div>
+  </section>
+
+  <!-- ====================== AJUSTES ====================== -->
+  <section id="tela-ajustes" class="tela">
+    <div class="painel">
+      <h2>Dados do cupom</h2>
+      <div class="campo">
+        <label for="cfgNome">Nome da festa / igreja</label>
+        <input id="cfgNome" type="text" maxlength="32" placeholder="Festa São Bom Jesus">
+      </div>
+      <div class="campo">
+        <label for="cfgLinha2">Linha extra (endereço, barraca...)</label>
+        <input id="cfgLinha2" type="text" maxlength="32" placeholder="Paróquia São Bom Jesus">
+      </div>
+      <div class="campo">
+        <label for="cfgRodape">Mensagem do rodapé</label>
+        <input id="cfgRodape" type="text" maxlength="40" placeholder="Deus abençoe! Obrigado pela ajuda.">
+      </div>
+    </div>
+
+    <div class="painel">
+      <h2>Impressora Bluetooth</h2>
+      <p class="dica">Use o <strong>Google Chrome</strong> (Windows ou Android). Ligue a impressora, deixe o Bluetooth do aparelho ativo e clique em conectar. O pareamento é feito na própria janela do Chrome.</p>
+      <div class="acoes-form">
+        <button id="btnConectar" class="btn-principal" type="button">Conectar impressora</button>
+        <button id="btnTeste" class="btn-secundario" type="button">Imprimir teste</button>
+        <button id="btnDesconectar" class="btn-secundario" type="button">Desconectar</button>
+      </div>
+      <div class="campo campo-curto">
+        <label for="cfgLargura">Largura do cupom</label>
+        <select id="cfgLargura">
+          <option value="32">58 mm (32 colunas)</option>
+          <option value="48">80 mm (48 colunas)</option>
+        </select>
+      </div>
+      <div class="campo campo-curto">
+        <label for="cfgCodepage">Acentuação</label>
+        <select id="cfgCodepage">
+          <option value="cp860">CP860 - Português (padrão)</option>
+          <option value="cp850">CP850 - Multilíngue</option>
+          <option value="sem">Sem acentos (à prova de falha)</option>
+        </select>
+      </div>
+      <div class="campo campo-curto">
+        <label for="cfgVias">Vias por pedido</label>
+        <select id="cfgVias">
+          <option value="1">1 via (cliente)</option>
+          <option value="2">2 vias (cliente + barraca)</option>
+        </select>
+      </div>
+      <label class="check"><input id="cfgCortar" type="checkbox"> Enviar comando de corte de papel</label>
+      <label class="check"><input id="cfgFallback" type="checkbox"> Se o Bluetooth falhar, abrir impressão do navegador</label>
+    </div>
+
+    <div class="painel">
+      <h2>Backup e dados</h2>
+      <p class="dica">Os dados ficam salvos <strong>neste navegador</strong>. Faça o backup no fim da festa.</p>
+      <div class="acoes-form">
+        <button id="btnBackup" class="btn-principal" type="button">Baixar backup</button>
+        <button id="btnRestaurar" class="btn-secundario" type="button">Restaurar backup</button>
+        <input id="arquivoBackup" type="file" accept="application/json" class="escondido">
+        <button id="btnZerarVendas" class="btn-perigo" type="button">Apagar vendas</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="aviso" class="aviso"></div>
+<div id="areaImpressaoNavegador" class="cupom-navegador"></div>
+
+<script src="assets/js/db.js"></script>
+<script src="assets/js/impressora.js"></script>
+<script src="assets/js/cupom.js"></script>
+<script src="assets/js/produtos.js"></script>
+<script src="assets/js/caixa.js"></script>
+<script src="assets/js/vendas.js"></script>
+<script src="assets/js/ajustes.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
