@@ -45,12 +45,11 @@ var TelaAjustes = (function () {
     });
     document.getElementById('arquivoLogo').addEventListener('change', receberLogo);
     document.getElementById('btnRemoverLogo').addEventListener('click', removerLogo);
-    document.getElementById('cfgLogoLargura').addEventListener('input', function () {
-      document.getElementById('logoLarguraValor').textContent = this.value;
-    });
+    document.getElementById('cfgLogoLargura').addEventListener('input', mostrarTamanho);
     document.getElementById('cfgLogoLimite').addEventListener('input', function () {
       document.getElementById('logoLimiteValor').textContent = this.value;
     });
+    document.getElementById('cfgLogoLargura').value = porcentagemSalva();
     document.getElementById('cfgLogoLargura').addEventListener('change', reconverterLogo);
     document.getElementById('cfgLogoLimite').addEventListener('change', reconverterLogo);
     desenharLogo();
@@ -120,30 +119,71 @@ var TelaAjustes = (function () {
   }
 
   /* ---------- Imagem da ficha ---------- */
-  var arquivoOriginal = null;   // guardado para reconverter ao mexer nos controles
+  /* O controle é em porcentagem da largura da ficha, que é o que a
+     pessoa consegue enxergar. A conversão para pontinhos da impressora
+     fica aqui, arredondada para múltiplo de 8 (um byte = 8 pontinhos). */
+  /* Qual porcentagem mostrar ao abrir a tela. Quem já tinha uma imagem
+     salva antes deste controle existir não tem logoPct guardado, então
+     descobrimos pela largura da imagem — senão o controle mostraria um
+     número que não bate com o que está no papel. */
+  function porcentagemSalva() {
+    var c = DB.config();
+    if (c.logoPct) return c.logoPct;
+    if (c.logo && c.logo.largura) {
+      var total = Logo.pontosPorLinha(c.largura || 32);
+      return Math.min(100, Math.max(10, Math.round(c.logo.largura / total * 20) * 5));
+    }
+    return 35;
+  }
+
+  function porcentagemEscolhida() {
+    return parseInt(document.getElementById('cfgLogoLargura').value, 10) || 35;
+  }
 
   function opcoesLogo() {
+    var total = Logo.pontosPorLinha(DB.config().largura || 32);
+    var pontos = Math.max(8, Math.round(total * porcentagemEscolhida() / 100 / 8) * 8);
     return {
-      largura: parseInt(document.getElementById('cfgLogoLargura').value, 10),
+      largura: pontos,
       limite: parseInt(document.getElementById('cfgLogoLimite').value, 10)
     };
+  }
+
+  function mostrarTamanho() {
+    var alvo = document.getElementById('logoLarguraValor');
+    var pct = porcentagemEscolhida();
+    var logo = DB.config().logo;
+    var texto = pct + '% da largura';
+    if (logo) {
+      texto += ' · ' + Logo.milimetros(logo.largura) + ' x ' +
+        Logo.milimetros(logo.altura) + ' mm no papel';
+    }
+    alvo.textContent = texto;
   }
 
   function receberLogo(ev) {
     var arquivo = ev.target.files && ev.target.files[0];
     if (!arquivo) return;
-    arquivoOriginal = arquivo;
-    converterLogo(arquivo);
     ev.target.value = '';
+    Logo.doArquivo(arquivo).then(function (original) {
+      DB.salvarConfig({ logoOriginal: original });
+      converterLogo();
+    }).catch(function (e) {
+      App.avisar(e.message || 'Não consegui usar essa imagem.', 'erro');
+    });
   }
 
-  function converterLogo(arquivo) {
-    Logo.doArquivo(arquivo, opcoesLogo()).then(function (logo) {
+  /* Reconverte sempre a partir do original guardado, então mexer no
+     tamanho funciona mesmo depois de fechar e abrir o sistema. */
+  function converterLogo() {
+    var original = DB.config().logoOriginal;
+    if (!original) return;
+    Logo.converter(original, opcoesLogo()).then(function (logo) {
       if (Logo.tamanhoKb(logo) > 400) {
         App.avisar('Imagem muito pesada. Diminua o tamanho na ficha.', 'erro');
         return;
       }
-      DB.salvarConfig({ logo: logo });
+      DB.salvarConfig({ logo: logo, logoPct: porcentagemEscolhida() });
       desenharLogo();
       App.avisar('Imagem salva! Veja em "Ver como fica".', 'ok');
     }).catch(function (e) {
@@ -151,17 +191,16 @@ var TelaAjustes = (function () {
     });
   }
 
-  /* Mexer no tamanho ou no contraste reconverte a partir do arquivo original,
-     para a imagem não ir perdendo qualidade a cada ajuste. */
   function reconverterLogo() {
-    if (arquivoOriginal) { converterLogo(arquivoOriginal); return; }
-    if (DB.config().logo) App.avisar('Escolha a imagem de novo para aplicar o novo tamanho.');
+    if (DB.config().logoOriginal) { converterLogo(); return; }
+    if (DB.config().logo) {
+      App.avisar('Escolha a imagem de novo para poder mudar o tamanho.', 'erro');
+    }
   }
 
   function removerLogo() {
     if (!DB.config().logo) return;
-    DB.salvarConfig({ logo: null });
-    arquivoOriginal = null;
+    DB.salvarConfig({ logo: null, logoOriginal: null });
     desenharLogo();
     App.avisar('Imagem removida.');
   }
@@ -172,6 +211,7 @@ var TelaAjustes = (function () {
     if (!logo || !logo.dados) {
       alvo.className = 'logo-preview vazio';
       alvo.textContent = 'Nenhuma imagem';
+      mostrarTamanho();
       return;
     }
     alvo.className = 'logo-preview';
@@ -185,6 +225,7 @@ var TelaAjustes = (function () {
       ' pontos · ' + Logo.tamanhoKb(logo) + ' KB';
     alvo.appendChild(img);
     alvo.appendChild(info);
+    mostrarTamanho();
   }
 
   function baixarBackup() {

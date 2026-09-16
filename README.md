@@ -39,8 +39,13 @@ Já deixei 12 produtos de exemplo cadastrados. Edite ou apague à vontade.
 
 Aba **Ajustes → Imagem da ficha → Escolher imagem**. O sistema converte o
 desenho para preto e branco e mostra como vai sair. Desenho de traço (contorno)
-fica bem melhor que foto. Os controles de **tamanho** e **contraste** ajustam
-se sair muito apagado ou muito borrado.
+fica bem melhor que foto.
+
+O **tamanho** é em porcentagem da largura da ficha, e o rótulo mostra quanto
+isso dá em milímetros no papel (35% ≈ 17 mm numa bobina de 58 mm). O
+**contraste** ajusta se o desenho sair apagado ou borrado. Os dois podem ser
+mexidos a qualquer momento: o sistema guarda o desenho original e reconverte
+sozinho.
 
 ### 3. Tema claro ou escuro
 

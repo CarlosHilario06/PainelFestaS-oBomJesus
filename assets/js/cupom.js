@@ -304,8 +304,13 @@ var Cupom = (function () {
           break;
         case 'imagem':
           if (b.logo && b.logo.dados) {
-            atual.push('<div class="c"><img class="logo" alt="" src="' +
-              Logo.paraDataUrl(b.logo) + '"></div>');
+            /* A largura tem que ser a fração real da bobina que a imagem
+               ocupa. Desenhar no tamanho natural em pixels faz a prévia
+               mostrar a imagem bem maior do que ela sai no papel. */
+            var fatia = Math.min(100, Math.round(
+              b.logo.largura / Logo.pontosPorLinha(L) * 100));
+            atual.push('<div class="c"><img class="logo" alt="" style="width:' +
+              fatia + '%" src="' + Logo.paraDataUrl(b.logo) + '"></div>');
           }
           break;
         case 'corte':

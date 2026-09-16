@@ -9,13 +9,24 @@
 var Logo = (function () {
 
   var LARGURA_MAXIMA = 384;   // pontos de uma impressora de 58mm
+  var PONTOS_POR_MM  = 8;     // impressora térmica comum: 203 dpi
+  var PONTOS_POR_LETRA = 12;  // 32 letras x 12 = 384 pontos na bobina de 58mm
+  var ORIGINAL_MAXIMO = 640;  // guardamos o original reduzido, para reconverter
 
-  /* ---------- Converter um arquivo escolhido pelo usuário ---------- */
-  function doArquivo(arquivo, opcoes) {
-    opcoes = opcoes || {};
-    var larguraAlvo = Math.min(opcoes.largura || 240, LARGURA_MAXIMA);
-    var limite = opcoes.limite || 160;   // do que é escuro o bastante para virar preto
+  /* Quantos pontinhos cabem na largura do papel */
+  function pontosPorLinha(colunas) {
+    return (colunas || 32) * PONTOS_POR_LETRA;
+  }
 
+  function milimetros(pontos) {
+    return Math.round(pontos / PONTOS_POR_MM);
+  }
+
+  /* ---------- Guardar o arquivo escolhido ----------
+     Guardamos o desenho original (reduzido) junto com a versão em
+     pontinhos. Sem ele, mexer no tamanho depois de recarregar a
+     página não teria de onde reconverter. */
+  function doArquivo(arquivo) {
     return new Promise(function (resolve, rejeitar) {
       if (!arquivo.type || arquivo.type.indexOf('image/') !== 0) {
         rejeitar(new Error('Isso não parece ser uma imagem.'));
@@ -27,12 +38,35 @@ var Logo = (function () {
         var img = new Image();
         img.onerror = function () { rejeitar(new Error('Não consegui abrir essa imagem.')); };
         img.onload = function () {
-          try { resolve(daImagem(img, larguraAlvo, limite)); }
-          catch (e) { rejeitar(e); }
+          var largura = Math.min(img.width, ORIGINAL_MAXIMO);
+          var altura = Math.round(img.height * (largura / img.width));
+          var tela = document.createElement('canvas');
+          tela.width = largura; tela.height = altura;
+          var ctx = tela.getContext('2d');
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, 0, largura, altura);
+          ctx.drawImage(img, 0, 0, largura, altura);
+          resolve(tela.toDataURL('image/png'));
         };
         img.src = leitor.result;
       };
       leitor.readAsDataURL(arquivo);
+    });
+  }
+
+  /* ---------- Original guardado -> pontinhos ---------- */
+  function converter(dataUrl, opcoes) {
+    opcoes = opcoes || {};
+    var larguraAlvo = Math.min(opcoes.largura || 130, LARGURA_MAXIMA);
+    var limite = opcoes.limite || 160;
+    return new Promise(function (resolve, rejeitar) {
+      var img = new Image();
+      img.onerror = function () { rejeitar(new Error('Não consegui abrir essa imagem.')); };
+      img.onload = function () {
+        try { resolve(daImagem(img, larguraAlvo, limite)); }
+        catch (e) { rejeitar(e); }
+      };
+      img.src = dataUrl;
     });
   }
 
@@ -126,6 +160,9 @@ var Logo = (function () {
 
   return {
     doArquivo: doArquivo,
+    converter: converter,
+    pontosPorLinha: pontosPorLinha,
+    milimetros: milimetros,
     paraBytes: paraBytes,
     paraDataUrl: paraDataUrl,
     tamanhoKb: tamanhoKb,
