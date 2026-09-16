@@ -4,8 +4,8 @@
   "description": "Sistema de caixa para festas da igreja, com impressão em impressora Bluetooth.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#f7f5f1",
-  "theme_color": "#a8532f",
+  "background_color": "#f5f7fb",
+  "theme_color": "#0e1c33",
   "lang": "pt-BR",
   "icons": [
     {

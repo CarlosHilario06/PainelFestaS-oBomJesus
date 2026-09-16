@@ -45,8 +45,12 @@ se sair muito apagado ou muito borrado.
 ### 3. Tema claro ou escuro
 
 O botão **Modo escuro / Modo claro** fica no alto da tela, ao lado da
-impressora. A escolha fica guardada naquele aparelho. Se o celular já estiver
-no modo escuro, o sistema abre escuro sozinho.
+impressora — e o tema novo entra num círculo que se abre a partir do botão.
+A escolha fica guardada naquele aparelho. Se o celular já estiver no modo
+escuro, o sistema abre escuro sozinho.
+
+(A animação usa View Transitions. Em navegador que não tem, ou para quem
+pediu menos animação nas configurações do aparelho, a troca é instantânea.)
 
 As fichas impressas não mudam: papel branco e tinta preta nos dois temas.
 

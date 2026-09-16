@@ -52,12 +52,51 @@ var App = (function () {
     return document.documentElement.getAttribute('data-tema') === 'escuro';
   }
 
-  function alternarTema() {
-    var escuro = !temaEscuro();
+  function aplicarTema(escuro) {
     if (escuro) document.documentElement.setAttribute('data-tema', 'escuro');
     else document.documentElement.removeAttribute('data-tema');
     try { localStorage.setItem(CHAVE_TEMA, escuro ? 'escuro' : 'claro'); } catch (e) {}
     mostrarTema();
+  }
+
+  /* Troca o tema com o novo visual se espalhando em círculo a partir do
+     botão. Se o navegador não tiver View Transitions (ou a pessoa pedir
+     menos animação no sistema), troca na hora — o resultado é o mesmo. */
+  function alternarTema(ev) {
+    var escuro = !temaEscuro();
+    var animar = document.startViewTransition &&
+      !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    if (!animar) { aplicarTema(escuro); return; }
+
+    /* centro do círculo: onde a pessoa clicou */
+    var alvo = (ev && ev.currentTarget) || document.getElementById('btnTema');
+    var caixa = alvo.getBoundingClientRect();
+    var x = (ev && ev.clientX) || (caixa.left + caixa.width / 2);
+    var y = (ev && ev.clientY) || (caixa.top + caixa.height / 2);
+
+    /* raio até o canto mais distante, senão sobra um pedaço sem pintar */
+    var raio = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    var transicao = document.startViewTransition(function () { aplicarTema(escuro); });
+    transicao.ready.then(function () {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            'circle(0px at ' + x + 'px ' + y + 'px)',
+            'circle(' + raio + 'px at ' + x + 'px ' + y + 'px)'
+          ]
+        },
+        {
+          duration: 520,
+          easing: 'cubic-bezier(.4,0,.2,1)',
+          pseudoElement: '::view-transition-new(root)'
+        }
+      );
+    }).catch(function () { /* animação é enfeite: se falhar, o tema já trocou */ });
   }
 
   function mostrarTema() {
@@ -66,7 +105,8 @@ var App = (function () {
     botao.textContent = escuro ? 'Modo claro' : 'Modo escuro';
     botao.title = escuro ? 'Voltar para o tema claro' : 'Trocar para o tema escuro';
     var cor = document.querySelector('meta[name="theme-color"]');
-    if (cor) cor.setAttribute('content', escuro ? '#191714' : '#f7f5f1');
+    /* acompanha a barra de cima, que é escura nos dois temas */
+    if (cor) cor.setAttribute('content', escuro ? '#0b1526' : '#0e1c33');
   }
 
   function abrirAba(nome) {

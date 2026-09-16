@@ -6,60 +6,77 @@
    =========================================================== */
 
 :root{
-  --fundo:#f7f5f1;
+  --fundo:#f5f7fb;
   --papel:#ffffff;
-  --papel-2:#f1eee8;
-  --borda:#e4ded4;
-  --borda-forte:#d3cabc;
-  --texto:#2c2723;
-  --texto-suave:#7c736a;
+  --papel-2:#eef2f8;
+  --borda:#e2e8f0;
+  --borda-forte:#cbd5e1;
+  --texto:#0f172a;
+  --texto-suave:#64748b;
 
-  --acento:#a8532f;
-  --acento-forte:#8b4225;
-  --acento-fraco:#f7ece6;
+  /* a barra de cima é azul escuro nos dois temas: é a identidade do app */
+  --topo:#0e1c33;
+  --topo-2:#16294a;
+  --topo-texto:#f1f5f9;
+  --topo-suave:#94a3b8;
+
+  --acento:#2563eb;
+  --acento-forte:#1d4ed8;
+  --acento-fraco:#eff6ff;
   --acento-texto:#ffffff;
+  --acento-claro:#60a5fa;
 
-  --dinheiro:#1c7c4c;
-  --dinheiro-fraco:#e6f3ec;
-  --dinheiro-botao:#1c7c4c;
+  --dinheiro:#047857;
+  --dinheiro-fraco:#ecfdf5;
+  --dinheiro-botao:#047857;
 
-  --perigo:#b3261e;
-  --perigo-fraco:#fbeae8;
+  --perigo:#dc2626;
+  --perigo-fraco:#fef2f2;
 
-  --info:#1d5f8a;
-  --info-fraco:#e6f0f7;
+  --info:#1d4ed8;
+  --info-fraco:#e8f0fe;
 
-  --raio:14px;
-  --sombra:0 1px 2px rgba(44,39,35,.05), 0 4px 14px rgba(44,39,35,.05);
-  --sombra-alta:0 -6px 24px rgba(44,39,35,.14);
+  --raio:12px;
+  --sombra:0 1px 2px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.05);
+  --sombra-alta:0 -6px 24px rgba(15,23,42,.16);
+  --sobreposicao:rgba(15,23,42,.6);
+  --aviso-fundo:#0f172a;
 }
 
 :root[data-tema="escuro"]{
-  --fundo:#191714;
-  --papel:#242119;
-  --papel-2:#2e2a22;
-  --borda:#3b352c;
-  --borda-forte:#4c463b;
-  --texto:#f1ece4;
-  --texto-suave:#a89e91;
+  --fundo:#080f1d;
+  --papel:#101b2f;
+  --papel-2:#17253d;
+  --borda:#22314c;
+  --borda-forte:#32425f;
+  --texto:#e8eefb;
+  --texto-suave:#94a3b8;
 
-  --acento:#e0906a;
-  --acento-forte:#eda682;
-  --acento-fraco:#3a2a21;
-  --acento-texto:#23190f;
+  --topo:#0b1526;
+  --topo-2:#16294a;
+  --topo-texto:#f1f5f9;
+  --topo-suave:#94a3b8;
 
-  --dinheiro:#5cc98d;
-  --dinheiro-fraco:#1f3a2c;
-  --dinheiro-botao:#2c8f5e;
+  --acento:#60a5fa;
+  --acento-forte:#93c5fd;
+  --acento-fraco:#16273f;
+  --acento-texto:#08111f;
+  --acento-claro:#60a5fa;
 
-  --perigo:#f0837a;
-  --perigo-fraco:#3d211f;
+  --dinheiro:#34d399;
+  --dinheiro-fraco:#0d2a23;
+  --dinheiro-botao:#0f9d6e;
 
-  --info:#7cb7dd;
-  --info-fraco:#1f303b;
+  --perigo:#f87171;
+  --perigo-fraco:#2d1618;
 
-  --sombra:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.28);
-  --sombra-alta:0 -6px 24px rgba(0,0,0,.45);
+  --info:#7dd3fc;
+  --info-fraco:#102a3e;
+
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.34);
+  --sombra-alta:0 -6px 24px rgba(0,0,0,.5);
+  --sobreposicao:rgba(2,6,16,.72);
+  --aviso-fundo:#1e293b;
 }
 
 *{box-sizing:border-box}
@@ -73,44 +90,41 @@ body{
 }
 :root,body{transition:background-color .18s ease,color .18s ease}
 
-/* ===== Topo ===== */
+/* ===== Topo (barra escura) ===== */
 .topo{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:var(--papel);color:var(--texto);
-  padding:14px 18px;border-bottom:1px solid var(--borda);
+  background:var(--topo);color:var(--topo-texto);padding:14px 18px 12px;
 }
 .topo-titulo{display:flex;flex-direction:column;line-height:1.25;min-width:0}
 .topo-titulo strong{
-  font-size:1.02rem;font-weight:700;letter-spacing:.2px;
+  font-size:1.02rem;font-weight:650;letter-spacing:.2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.topo-titulo span{font-size:.78rem;color:var(--texto-suave)}
+.topo-titulo span{font-size:.78rem;color:var(--topo-suave)}
 .topo-acoes{display:flex;align-items:center;gap:8px;flex:none}
 
 .btn-tema,.chip{
-  border:1px solid var(--borda-forte);background:var(--papel-2);color:var(--texto);
-  border-radius:999px;padding:8px 14px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+  color:var(--topo-texto);border-radius:8px;padding:8px 13px;cursor:pointer;
   font-size:.8rem;font-weight:600;white-space:nowrap;font-family:inherit;
+  transition:background-color .15s ease,border-color .15s ease;
 }
-.btn-tema:hover,.chip:hover{border-color:var(--acento);color:var(--acento)}
+.btn-tema:hover,.chip:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3)}
 .chip{display:inline-flex;align-items:center;gap:8px}
-.chip-on{background:var(--dinheiro-fraco);border-color:var(--dinheiro);color:var(--dinheiro)}
-.bolinha{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none;opacity:.55}
+.chip-on{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.45);color:#6ee7b7}
+.bolinha{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none;opacity:.5}
 .chip-on .bolinha{opacity:1;animation:pulsa 2s infinite}
 @keyframes pulsa{50%{opacity:.3}}
 
-/* ===== Abas ===== */
-.abas{
-  display:flex;background:var(--papel);overflow-x:auto;
-  border-bottom:1px solid var(--borda);padding:0 8px;
-}
+/* ===== Abas (na mesma barra escura) ===== */
+.abas{display:flex;background:var(--topo);overflow-x:auto;padding:0 10px}
 .aba{
-  flex:1;min-width:88px;border:none;background:transparent;color:var(--texto-suave);
-  padding:13px 8px;font-size:.92rem;font-weight:600;cursor:pointer;font-family:inherit;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
+  flex:1;min-width:86px;border:none;background:transparent;color:var(--topo-suave);
+  padding:11px 8px 13px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;
+  border-bottom:2px solid transparent;transition:color .15s ease;
 }
-.aba:hover{color:var(--texto)}
-.aba.ativa{color:var(--acento);border-bottom-color:var(--acento)}
+.aba:hover{color:var(--topo-texto)}
+.aba.ativa{color:#fff;border-bottom-color:var(--acento-claro)}
 
 main{padding:18px;max-width:1400px;margin:0 auto}
 .tela{display:none}
@@ -349,7 +363,7 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 /* ===== Aviso ===== */
 .aviso{
   position:fixed;left:50%;bottom:24px;transform:translate(-50%,160%);
-  background:#2c2723;color:#fff;padding:13px 20px;border-radius:11px;
+  background:var(--aviso-fundo);color:#fff;padding:13px 20px;border-radius:11px;
   font-size:.92rem;font-weight:600;box-shadow:var(--sombra);z-index:99;
   transition:transform .25s ease;max-width:90vw;text-align:center;
   display:flex;align-items:center;justify-content:center;
@@ -395,7 +409,7 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 
 /* ===== Janela de pré-visualização ===== */
 .previa{
-  position:fixed;inset:0;background:rgba(20,17,14,.68);z-index:100;
+  position:fixed;inset:0;background:var(--sobreposicao);z-index:100;
   display:flex;align-items:center;justify-content:center;padding:16px;
 }
 .previa.escondido{display:none !important}
@@ -416,6 +430,22 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 /* no computador a barra do rodapé não existe */
 @media (min-width:901px){.barra-resumo{display:none}}
 @media (max-width:900px){.atalhos-dica{display:none}}
+
+/* ===========================================================
+   Animação da troca de tema
+   O novo tema entra num círculo que cresce a partir do botão.
+   Quem não tem View Transitions troca na hora, sem animação.
+   =========================================================== */
+::view-transition-old(root),
+::view-transition-new(root){
+  animation:none;mix-blend-mode:normal;
+}
+::view-transition-old(root){z-index:1}
+::view-transition-new(root){z-index:2}
+
+@media (prefers-reduced-motion:reduce){
+  :root,body{transition:none}
+}
 
 /* ==========================================================
    Celular - fica no FIM de propósito.
