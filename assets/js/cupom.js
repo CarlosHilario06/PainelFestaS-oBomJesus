@@ -215,6 +215,47 @@ var Cupom = (function () {
     ];
   }
 
+  /* ---------- Teste de acentos ----------
+     A mesma frase impressa em cada tabela de caracteres. A impressora
+     ignora as que não conhece e sai embaralhado; a linha que estiver
+     legível diz qual tabela escolher nos Ajustes. */
+  var TABELAS_TESTE = [
+    ['cp860', 'CP860'],
+    ['cp850', 'CP850'],
+    ['cp858', 'CP858'],
+    ['wpc1252', 'WINDOWS'],
+    ['cp437', 'CP437']
+  ];
+
+  function doTesteAcentos() {
+    var blocos = [
+      { t: 'negrito', v: 'TESTE DE ACENTOS' },
+      { t: 'branco', n: 1 },
+      { t: 'txt', v: 'Procure a linha que estiver' },
+      { t: 'txt', v: 'legivel e escolha ela nos' },
+      { t: 'txt', v: 'Ajustes, em Acentuacao.' },
+      { t: 'linha', c: '-' }
+    ];
+
+    TABELAS_TESTE.forEach(function (par) {
+      blocos.push({ t: 'codepage', codepage: par[0] });
+      blocos.push({ t: 'txt', v: par[1] + ':' });
+      blocos.push({ t: 'txt', v: '  ação pão café açúcar' });
+      blocos.push({ t: 'branco', n: 1 });
+    });
+
+    /* volta para uma tabela segura antes de encerrar */
+    blocos.push({ t: 'codepage', codepage: 'sem' });
+    blocos.push({ t: 'linha', c: '-' });
+    blocos.push({ t: 'txt', v: 'SEM ACENTOS:' });
+    blocos.push({ t: 'txt', v: '  acao pao cafe acucar' });
+    blocos.push({ t: 'branco', n: 1 });
+    blocos.push({ t: 'txt', v: 'Se nenhuma acima ficou boa,' });
+    blocos.push({ t: 'txt', v: 'use "Sem acentos": sempre sai.' });
+    blocos.push({ t: 'corte' });
+    return blocos;
+  }
+
   /* ---------- Régua: descobre a largura real da impressora ----------
      As caixas costumam trazer medidas que se contradizem. Em vez de
      adivinhar, imprimimos duas réguas: a que couber inteira numa
@@ -277,6 +318,8 @@ var Cupom = (function () {
           saida += String(b.v).slice(0, L) + '\n'; break;
         case 'bruto':
           saida += String(b.v) + '\n'; break;
+        case 'codepage':
+          break;   /* só vale para a impressora */
         case 'ld':
           var e = String(b.e), d = String(b.d);
           var sobra = L - d.length;
@@ -329,6 +372,8 @@ var Cupom = (function () {
           atual.push('<div>' + escapar(b.v) + '</div>'); break;
         case 'bruto':
           atual.push('<div class="r">' + escapar(b.v) + '</div>'); break;
+        case 'codepage':
+          break;   /* só vale para a impressora */
         case 'ld':
           atual.push('<div class="ld"><span>' + escapar(b.e) +
             '</span><span>' + escapar(b.d) + '</span></div>'); break;
@@ -367,6 +412,7 @@ var Cupom = (function () {
     doFechamento: doFechamento,
     doTeste: doTeste,
     doRegua: doRegua,
+    doTesteAcentos: doTesteAcentos,
     paraTexto: paraTexto,
     paraHtml: paraHtml,
     quebrar: quebrar,

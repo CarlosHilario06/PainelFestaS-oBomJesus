@@ -35,6 +35,7 @@ var TelaAjustes = (function () {
     });
     document.getElementById('btnTeste').addEventListener('click', imprimirTeste);
     document.getElementById('btnRegua').addEventListener('click', imprimirRegua);
+    document.getElementById('btnAcentos').addEventListener('click', imprimirAcentos);
     document.getElementById('btnPrevia').addEventListener('click', verPrevia);
     document.getElementById('fecharPrevia').addEventListener('click', fecharPrevia);
     document.getElementById('previa').addEventListener('click', function (ev) {
@@ -104,6 +105,12 @@ var TelaAjustes = (function () {
      escrita na caixa. */
   function imprimirRegua() {
     App.enviarParaImpressora(Cupom.doRegua(), 'Régua');
+  }
+
+  /* Imprime a mesma frase em várias tabelas de caracteres: a que sair
+     legível é a que esta impressora entende. */
+  function imprimirAcentos() {
+    App.enviarParaImpressora(Cupom.doTesteAcentos(), 'Teste de acentos');
   }
 
   /* Mostra na tela como o papel vai sair, com um pedido de exemplo */

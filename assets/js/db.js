@@ -15,7 +15,7 @@ var DB = (function () {
       linha2: 'Paroquia Sao Bom Jesus',
       rodape: 'Deus abencoe! Obrigado.',
       largura: 32,
-      codepage: 'cp860',
+      codepage: 'sem',
       imprimirAoFinalizar: 'fichas',
       modoImpressao: 'bluetooth',
       cortar: false,

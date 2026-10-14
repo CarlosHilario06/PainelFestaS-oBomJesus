@@ -79,7 +79,20 @@ linha só, sem dobrar, é a sua largura:
 O que vale é a **quantidade de pontos por linha**, não a largura do papel: uma
 impressora de 384 pontos usa 32 colunas mesmo com bobina de 80 mm.
 
-### 6. Conectar a impressora
+### 6. Acertar os acentos
+
+Cada impressora entende uma tabela de caracteres diferente, e muitas ignoram
+a que o sistema pede — aí "ação" sai como letra japonesa ou símbolo embaralhado.
+
+Em **Ajustes → Testar acentos** sai a palavra `ação pão café açúcar` repetida
+em cinco tabelas, cada uma com o nome em cima. Escolha em **Acentuação** a
+tabela da linha que saiu legível.
+
+Se nenhuma ficar boa, deixe em **"Sem acentos"** — é o padrão de fábrica e
+sempre funciona: imprime `acao pao cafe acucar`, sem acento nenhum, mas
+legível em qualquer impressora. Numa ficha de barraquinha isso não faz falta.
+
+### 7. Conectar a impressora
 
 1. Ligue a impressora e deixe o Bluetooth do computador ligado.
 2. Clique em **Conectar impressora** (no alto da tela, à direita).
@@ -88,7 +101,7 @@ impressora de 384 pontos usa 32 colunas mesmo com bobina de 80 mm.
 
 Quando a bolinha ficar verde, está pronto.
 
-### 7. Na hora do pedido
+### 8. Na hora do pedido
 
 1. Clique nos produtos — cada clique soma 1 unidade.
 2. Ajuste quantidades com os botões **−** e **+**.
@@ -139,7 +152,7 @@ a tela para você corrigir. O botão *Limpar* também pode ser desfeito.
 > **só o cupom** da compra, ou **cupom + fichas**. O botão **Ver como fica**
 > mostra na tela, sem gastar papel.
 
-### 8. No fim da noite
+### 9. No fim da noite
 
 Aba **Vendas**:
 
@@ -150,7 +163,7 @@ Aba **Vendas**:
 - dá para **cancelar** um pedido errado (sai do total) e **reimprimir** as
   fichas de um pedido, caso alguma se perca ou o papel acabe no meio.
 
-### 9. Backup — importante!
+### 10. Backup — importante!
 
 Os dados ficam **neste navegador, neste computador**. Se limparem o histórico
 do Chrome, some tudo.
@@ -166,7 +179,7 @@ voltar depois, é **Restaurar backup**.
 |---|---|
 | Nome da festa / linha extra / rodapé | O que sai impresso no alto e no pé do cupom |
 | Largura do cupom | 58 mm (padrão, bobina pequena) ou 80 mm (impressora de balcão) |
-| Acentuação | Se sair "cora????o" no papel, troque para CP850 ou "Sem acentos" |
+| Acentuação | Qual tabela de caracteres a impressora entende — descubra com "Testar acentos" |
 | Imagem da ficha | A figura do São Bom Jesus (ou o brasão) impressa no alto de cada ficha |
 | O que imprimir ao finalizar | Fichas destacáveis (padrão), só o cupom, ou os dois |
 | Corte de papel | Só ligue se a sua impressora tiver serrinha automática |
@@ -182,8 +195,9 @@ voltar depois, é **Restaurar backup**.
 se ela não está pareada em outro celular e tente de novo. Impressoras que só
 funcionam por USB ou por Wi-Fi não aparecem aqui.
 
-**Imprime com símbolos estranhos no lugar dos acentos** — Ajustes →
-Acentuação → teste **CP850**; se continuar, use **Sem acentos**.
+**Imprime com símbolos estranhos ou letra japonesa no lugar dos acentos** —
+Ajustes → **Testar acentos**, e escolha a tabela da linha que saiu legível.
+Se nenhuma servir, use **Sem acentos**.
 
 **Caiu a conexão no meio da festa** — clique no botão da impressora lá em cima
 para reconectar. **Nenhuma venda se perde**: elas são salvas antes de imprimir,

@@ -39,8 +39,30 @@ var Impressora = (function () {
     'Õ':0xE5,'Ú':0xE9,'Û':0xEA,'Ù':0xEB,'§':0xF5
   };
 
-  /* Comando ESC t n - seleciona a tabela de caracteres da impressora */
-  var SELETOR = { cp860: 3, cp850: 2 };
+  /* Windows-1252 é a tabela do Windows: nela os acentos valem o próprio
+     código Unicode, então não precisa de lista — basta o número do caractere. */
+  function dePagina1252(ch) {
+    var c = ch.charCodeAt(0);
+    return (c >= 0xA0 && c <= 0xFF) ? c : null;
+  }
+
+  /* CP437 é a tabela mais antiga e não tem "ã" nem "õ" — fica aqui porque
+     algumas impressoras só aceitam ela. */
+  var CP437 = {
+    'Ç':0x80,'ü':0x81,'é':0x82,'â':0x83,'ä':0x84,'à':0x85,'å':0x86,'ç':0x87,
+    'ê':0x88,'ë':0x89,'è':0x8A,'ï':0x8B,'î':0x8C,'ì':0x8D,'Ä':0x8E,'Å':0x8F,
+    'É':0x90,'æ':0x91,'Æ':0x92,'ô':0x93,'ö':0x94,'ò':0x95,'û':0x96,'ù':0x97,
+    'ÿ':0x98,'Ö':0x99,'Ü':0x9A,'¢':0x9B,'£':0x9C,'¥':0x9D,'ƒ':0x9F,
+    'á':0xA0,'í':0xA1,'ó':0xA2,'ú':0xA3,'ñ':0xA4,'Ñ':0xA5,'ª':0xA6,'º':0xA7,'¿':0xA8
+  };
+
+  /* Comando ESC t n - diz à impressora qual tabela de caracteres usar.
+     Nem toda impressora conhece todas: por isso existe o teste de acentos. */
+  var SELETOR = { cp437: 0, cp850: 2, cp860: 3, cp863: 4, cp865: 5, wpc1252: 16, cp858: 19 };
+
+  var TABELAS = {};   // preenchido abaixo, depois que CP860/CP850 existem
+
+  TABELAS = { cp860: CP860, cp850: CP850, cp858: CP850, cp437: CP437 };
 
   function semAcento(txt) {
     return txt.normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -48,7 +70,19 @@ var Impressora = (function () {
 
   /* Converte o texto do cupom em bytes que a impressora entende */
   function paraBytes(texto, codepage) {
-    var tabela = codepage === 'cp850' ? CP850 : (codepage === 'cp860' ? CP860 : null);
+    if (codepage === 'wpc1252') {
+      var fora = [];
+      for (var k = 0; k < texto.length; k++) {
+        var cod = texto.charCodeAt(k);
+        if (cod < 128) { fora.push(cod); continue; }
+        var win = dePagina1252(texto[k]);
+        if (win !== null) { fora.push(win); continue; }
+        var simples = semAcento(texto[k]);
+        fora.push(simples.charCodeAt(0) < 128 ? simples.charCodeAt(0) : 0x3F);
+      }
+      return fora;
+    }
+    var tabela = TABELAS[codepage] || null;
     if (!tabela) texto = semAcento(texto);
     var saida = [];
     for (var i = 0; i < texto.length; i++) {
@@ -80,11 +114,11 @@ var Impressora = (function () {
   }
 
   /* Traduz um bloco do cupom nos bytes que a impressora entende */
-  function bytesDoBloco(bloco, cfg) {
+  function bytesDoBloco(bloco, cfg, codepage) {
     var L = cfg.largura || 32;
     var b = [];
     function escrever(txt) {
-      b = b.concat(paraBytes(String(txt), cfg.codepage));
+      b = b.concat(paraBytes(String(txt), codepage || cfg.codepage));
       b.push(0x0A);
     }
 
@@ -157,15 +191,23 @@ var Impressora = (function () {
     return b;
   }
 
-  /* Monta o pacote completo de um documento (lista de blocos) */
+  /* Monta o pacote completo de um documento (lista de blocos).
+     A tabela de acentos pode mudar no meio, para o teste que mostra
+     a mesma frase em várias tabelas de uma vez. */
   function montarPacote(blocos, cfg) {
     var bytes = [0x1B, 0x40];                       // ESC @ = reiniciar
-    if (SELETOR[cfg.codepage]) {
-      bytes.push(0x1B, 0x74, SELETOR[cfg.codepage]); // ESC t n = acentuação
+    var atual = cfg.codepage;
+    if (SELETOR[atual] !== undefined) {
+      bytes.push(0x1B, 0x74, SELETOR[atual]);       // ESC t n = acentuação
     }
     bytes = bytes.concat(ESQUERDA);
     blocos.forEach(function (bloco) {
-      bytes = bytes.concat(bytesDoBloco(bloco, cfg));
+      if (bloco.t === 'codepage') {
+        atual = bloco.codepage;
+        if (SELETOR[atual] !== undefined) bytes.push(0x1B, 0x74, SELETOR[atual]);
+        return;
+      }
+      bytes = bytes.concat(bytesDoBloco(bloco, cfg, atual));
     });
     return new Uint8Array(bytes);
   }

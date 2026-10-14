@@ -241,6 +241,7 @@
         <button id="btnConectar" class="btn-principal" type="button">Conectar impressora</button>
         <button id="btnTeste" class="btn-secundario" type="button">Imprimir teste</button>
         <button id="btnRegua" class="btn-secundario" type="button">Imprimir régua</button>
+        <button id="btnAcentos" class="btn-secundario" type="button">Testar acentos</button>
         <button id="btnPrevia" class="btn-secundario" type="button">Ver como fica</button>
         <button id="btnDesconectar" class="btn-secundario" type="button">Desconectar</button>
       </div>
@@ -254,10 +255,15 @@
       <div class="campo campo-curto">
         <label for="cfgCodepage">Acentuação</label>
         <select id="cfgCodepage">
-          <option value="cp860">CP860 - Português (padrão)</option>
+          <option value="sem">Sem acentos (sempre funciona)</option>
+          <option value="cp860">CP860 - Português</option>
           <option value="cp850">CP850 - Multilíngue</option>
-          <option value="sem">Sem acentos (à prova de falha)</option>
+          <option value="cp858">CP858</option>
+          <option value="wpc1252">Windows-1252</option>
+          <option value="cp437">CP437 - antiga</option>
         </select>
+        <span class="dica">Saindo em letra estranha? Clique em "Testar acentos" e
+          escolha aqui a tabela que sair legível.</span>
       </div>
       <div class="campo campo-curto">
         <label for="cfgAoFinalizar">O que imprimir ao finalizar</label>
