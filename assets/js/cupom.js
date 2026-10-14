@@ -215,6 +215,42 @@ var Cupom = (function () {
     ];
   }
 
+  /* ---------- Régua: descobre a largura real da impressora ----------
+     As caixas costumam trazer medidas que se contradizem. Em vez de
+     adivinhar, imprimimos duas réguas: a que couber inteira numa
+     linha, sem dobrar, é a largura certa. */
+  function reguaDe(n) {
+    var s = '';
+    for (var i = 1; i <= n; i++) {
+      if (i % 10 === 0) s += String((i / 10) % 10);
+      else if (i % 5 === 0) s += '|';
+      else s += '.';
+    }
+    return s;
+  }
+
+  function doRegua() {
+    return [
+      { t: 'negrito', v: 'REGUA DA IMPRESSORA' },
+      { t: 'branco', n: 1 },
+      { t: 'txt', v: 'Veja qual das duas reguas' },
+      { t: 'txt', v: 'coube numa linha so:' },
+      { t: 'linha', c: '-' },
+      { t: 'txt', v: 'A)' },
+      { t: 'bruto', v: reguaDe(32) },
+      { t: 'branco', n: 1 },
+      { t: 'txt', v: 'B)' },
+      { t: 'bruto', v: reguaDe(48) },
+      { t: 'linha', c: '-' },
+      { t: 'txt', v: 'Se a B dobrou para a linha' },
+      { t: 'txt', v: 'de baixo: use 58mm (32).' },
+      { t: 'branco', n: 1 },
+      { t: 'txt', v: 'Se a B saiu inteira:' },
+      { t: 'txt', v: 'use 80mm (48 colunas).' },
+      { t: 'corte' }
+    ];
+  }
+
   /* ---------- Converter blocos em texto puro ----------
      Usado na pré-visualização e nos testes. A letra grande
      aparece em MAIÚSCULAS, já que texto puro não tem tamanho. */
@@ -239,6 +275,8 @@ var Cupom = (function () {
           saida += centralizar(String(b.v).toUpperCase(), Math.floor(L / 2)) + '\n'; break;
         case 'txt':
           saida += String(b.v).slice(0, L) + '\n'; break;
+        case 'bruto':
+          saida += String(b.v) + '\n'; break;
         case 'ld':
           var e = String(b.e), d = String(b.d);
           var sobra = L - d.length;
@@ -289,6 +327,8 @@ var Cupom = (function () {
           atual.push('<div class="c g">' + escapar(b.v) + '</div>'); break;
         case 'txt':
           atual.push('<div>' + escapar(b.v) + '</div>'); break;
+        case 'bruto':
+          atual.push('<div class="r">' + escapar(b.v) + '</div>'); break;
         case 'ld':
           atual.push('<div class="ld"><span>' + escapar(b.e) +
             '</span><span>' + escapar(b.d) + '</span></div>'); break;
@@ -326,6 +366,7 @@ var Cupom = (function () {
     doPedido: doPedido,
     doFechamento: doFechamento,
     doTeste: doTeste,
+    doRegua: doRegua,
     paraTexto: paraTexto,
     paraHtml: paraHtml,
     quebrar: quebrar,

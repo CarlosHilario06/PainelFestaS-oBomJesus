@@ -344,6 +344,16 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 .cartao.destaque{background:var(--dinheiro-fraco);border-color:var(--dinheiro)}
 .cartao.destaque .valor{color:var(--dinheiro)}
 
+/* ===== Diagnóstico da impressora ===== */
+.diagnostico{
+  font-size:.85rem;line-height:1.6;padding:12px 14px;border-radius:10px;
+  margin:0 0 14px;border:1px solid var(--borda);background:var(--papel-2);
+  color:var(--texto-suave);
+}
+.diagnostico.ruim{
+  background:var(--perigo-fraco);border-color:var(--perigo);color:var(--perigo);
+}
+
 /* ===== Imagem da ficha ===== */
 .logo-area{display:grid;grid-template-columns:155px 1fr;gap:18px;align-items:start}
 @media (max-width:620px){.logo-area{grid-template-columns:1fr}}

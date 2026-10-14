@@ -225,11 +225,22 @@
     </div>
 
     <div class="painel">
-      <h2>Impressora Bluetooth</h2>
-      <p class="dica">Use o <strong>Google Chrome</strong> (Windows ou Android). Ligue a impressora, deixe o Bluetooth do aparelho ativo e clique em conectar. O pareamento é feito na própria janela do Chrome.</p>
+      <h2>Impressão</h2>
+
+      <div class="campo campo-curto">
+        <label for="cfgModoImpressao">Como imprimir</label>
+        <select id="cfgModoImpressao">
+          <option value="bluetooth">Bluetooth direto (impressora térmica)</option>
+          <option value="navegador">Pela janela de impressão (impressora instalada no computador)</option>
+        </select>
+      </div>
+
+      <div id="diagnosticoImpressora" class="diagnostico"></div>
+
       <div class="acoes-form">
         <button id="btnConectar" class="btn-principal" type="button">Conectar impressora</button>
         <button id="btnTeste" class="btn-secundario" type="button">Imprimir teste</button>
+        <button id="btnRegua" class="btn-secundario" type="button">Imprimir régua</button>
         <button id="btnPrevia" class="btn-secundario" type="button">Ver como fica</button>
         <button id="btnDesconectar" class="btn-secundario" type="button">Desconectar</button>
       </div>

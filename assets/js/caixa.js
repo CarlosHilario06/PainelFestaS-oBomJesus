@@ -326,9 +326,10 @@ var TelaCaixa = (function () {
   /* Sem impressora conectada o botão não promete imprimir, e o
      "finalizar sem imprimir" some por ser redundante. */
   function atualizarBotoes() {
-    var temImpressora = Impressora.conectada();
-    btnFinalizar.textContent = temImpressora ? 'Finalizar e imprimir' : 'Finalizar venda';
-    btnFinalizarSem.classList.toggle('escondido', !temImpressora);
+    var pelaJanela = DB.config().modoImpressao === 'navegador';
+    var vaiImprimir = pelaJanela || Impressora.conectada();
+    btnFinalizar.textContent = vaiImprimir ? 'Finalizar e imprimir' : 'Finalizar venda';
+    btnFinalizarSem.classList.toggle('escondido', !vaiImprimir);
   }
 
   function atualizarTroco() {
@@ -365,7 +366,9 @@ var TelaCaixa = (function () {
   /* ---------- Finalizar ---------- */
   function finalizar(comImpressao) {
     if (carrinho.length === 0) return;
-    if (comImpressao === undefined) comImpressao = Impressora.conectada();
+    if (comImpressao === undefined) {
+      comImpressao = DB.config().modoImpressao === 'navegador' || Impressora.conectada();
+    }
 
     var valorTotal = total();
     var recebido = Dinheiro.paraCentavos(elRecebido.value);

@@ -107,6 +107,11 @@ var Impressora = (function () {
         escrever(String(bloco.v).slice(0, L));
         break;
 
+      case 'bruto':
+        /* sem cortar: a régua precisa sair inteira para poder medir */
+        escrever(String(bloco.v));
+        break;
+
       case 'ld':
         var e = String(bloco.e), d = String(bloco.d);
         var sobra = L - d.length;
@@ -166,6 +171,39 @@ var Impressora = (function () {
   }
 
   /* ---------- Conexão ---------- */
+  /* Por que o Bluetooth do navegador pode não estar disponível.
+     Serve para dizer à pessoa o que exatamente está faltando, em vez
+     de só "não consegui conectar". */
+  function diagnostico() {
+    var protocolo = location.protocol;
+    var seguro = window.isSecureContext !== false;
+    var temApi = typeof navigator !== 'undefined' && !!navigator.bluetooth;
+    var ua = navigator.userAgent || '';
+    var ehChrome = /Chrome|Chromium|Edg/.test(ua) && !/OPR|Firefox/.test(ua);
+    var ehApple = /iPhone|iPad|iPod/.test(ua) || (/Safari/.test(ua) && !ehChrome);
+
+    var motivo = null;
+    if (!temApi) {
+      if (ehApple) {
+        motivo = 'iPhone e iPad não deixam o navegador usar Bluetooth. ' +
+                 'Use um computador ou celular Android com Chrome.';
+      } else if (!ehChrome) {
+        motivo = 'Este navegador não fala Bluetooth. Abra no Google Chrome ou no Edge.';
+      } else if (protocolo === 'file:') {
+        motivo = 'Abrindo o arquivo direto do computador o Chrome bloqueia o Bluetooth. ' +
+                 'Use o endereço do site (https://).';
+      } else if (!seguro) {
+        motivo = 'O Bluetooth só funciona em endereço https. Este aqui é ' + protocolo;
+      } else {
+        motivo = 'O Chrome deste aparelho está sem o Bluetooth habilitado.';
+      }
+    }
+    return {
+      disponivel: temApi, motivo: motivo,
+      protocolo: protocolo, seguro: seguro, chrome: ehChrome
+    };
+  }
+
   function suportado() {
     return typeof navigator !== 'undefined' && !!navigator.bluetooth;
   }
@@ -199,7 +237,10 @@ var Impressora = (function () {
     }).then(function (servicos) {
       return procurarCaracteristica(servicos, 0);
     }).then(function (car) {
-      if (!car) throw new Error('Não achei o canal de impressão neste aparelho. Ele é uma impressora térmica Bluetooth?');
+      if (!car) {
+        throw new Error('Achei o aparelho, mas ele não aceita receber impressão por aqui. ' +
+          'Provavelmente é uma impressora Bluetooth "clássica", que o navegador não alcança.');
+      }
       caracteristica = car;
       aoMudarEstado();
       return nomeDispositivo();
@@ -270,6 +311,7 @@ var Impressora = (function () {
 
   return {
     suportado: suportado,
+    diagnostico: diagnostico,
     conectada: conectada,
     conectar: conectar,
     desconectar: desconectar,

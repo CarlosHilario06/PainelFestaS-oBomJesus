@@ -17,6 +17,7 @@ var DB = (function () {
       largura: 32,
       codepage: 'cp860',
       imprimirAoFinalizar: 'fichas',
+      modoImpressao: 'bluetooth',
       cortar: false,
       fallbackNavegador: false
     }

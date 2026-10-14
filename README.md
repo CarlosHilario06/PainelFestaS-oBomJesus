@@ -64,7 +64,22 @@ As fichas impressas não mudam: papel branco e tinta preta nos dois temas.
 Na aba **Produtos**, as setas ↑ ↓ mudam a posição. Vale deixar a ordem da tela
 igual à das barracas — quem opera acha por reflexo.
 
-### 5. Conectar a impressora
+### 5. Descobrir a largura real da impressora
+
+As caixas costumam trazer medidas que se contradizem — a minha diz "impressão
+efetiva 78 mm" e "384 pontos por linha" na mesma etiqueta, e os dois não podem
+estar certos ao mesmo tempo.
+
+Em **Ajustes → Imprimir régua** saem duas réguas numeradas. A que couber numa
+linha só, sem dobrar, é a sua largura:
+
+- a régua **B dobrou** para a linha de baixo → use **58 mm (32 colunas)**
+- a régua **B saiu inteira** → use **80 mm (48 colunas)**
+
+O que vale é a **quantidade de pontos por linha**, não a largura do papel: uma
+impressora de 384 pontos usa 32 colunas mesmo com bobina de 80 mm.
+
+### 6. Conectar a impressora
 
 1. Ligue a impressora e deixe o Bluetooth do computador ligado.
 2. Clique em **Conectar impressora** (no alto da tela, à direita).
@@ -73,7 +88,7 @@ igual à das barracas — quem opera acha por reflexo.
 
 Quando a bolinha ficar verde, está pronto.
 
-### 6. Na hora do pedido
+### 7. Na hora do pedido
 
 1. Clique nos produtos — cada clique soma 1 unidade.
 2. Ajuste quantidades com os botões **−** e **+**.
@@ -124,7 +139,7 @@ a tela para você corrigir. O botão *Limpar* também pode ser desfeito.
 > **só o cupom** da compra, ou **cupom + fichas**. O botão **Ver como fica**
 > mostra na tela, sem gastar papel.
 
-### 7. No fim da noite
+### 8. No fim da noite
 
 Aba **Vendas**:
 
@@ -135,7 +150,7 @@ Aba **Vendas**:
 - dá para **cancelar** um pedido errado (sai do total) e **reimprimir** as
   fichas de um pedido, caso alguma se perca ou o papel acabe no meio.
 
-### 8. Backup — importante!
+### 9. Backup — importante!
 
 Os dados ficam **neste navegador, neste computador**. Se limparem o histórico
 do Chrome, some tudo.

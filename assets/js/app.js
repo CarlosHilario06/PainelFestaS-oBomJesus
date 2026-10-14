@@ -118,6 +118,12 @@ var App = (function () {
     });
     if (nome === 'vendas') TelaVendas.desenhar();
     if (nome === 'produtos') TelaProdutos.desenhar();
+    /* o caixa também: ajustes como o modo de impressão mudam o
+       texto do botão de finalizar */
+    if (nome === 'caixa') TelaCaixa.desenhar();
+    /* o caixa também: ajustes como o modo de impressão mudam o
+       texto do botão de finalizar */
+    if (nome === 'caixa') TelaCaixa.desenhar();
     window.scrollTo({ top: 0 });
   }
 
@@ -171,6 +177,12 @@ var App = (function () {
 
   /* Tenta o Bluetooth; se não der, cai para a impressão do navegador */
   function enviarParaImpressora(blocos, rotulo) {
+    /* Quem escolheu imprimir pela janela do computador não passa pelo
+       Bluetooth: vai direto, sem tentar conectar em nada. */
+    if (DB.config().modoImpressao === 'navegador') {
+      Impressora.imprimirPeloNavegador(blocos);
+      return;
+    }
     if (Impressora.conectada()) {
       Impressora.imprimir(blocos, 1).then(function () {
         avisar((rotulo || 'Cupom') + ' impresso.', 'ok');

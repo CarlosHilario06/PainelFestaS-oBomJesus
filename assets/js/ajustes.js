@@ -15,7 +15,8 @@ var TelaAjustes = (function () {
       aoFinalizar: document.getElementById('cfgAoFinalizar'),
       cortar: document.getElementById('cfgCortar'),
       fallback: document.getElementById('cfgFallback'),
-      logoNaFicha: document.getElementById('cfgLogoNaFicha')
+      logoNaFicha: document.getElementById('cfgLogoNaFicha'),
+      modoImpressao: document.getElementById('cfgModoImpressao')
     };
 
     carregar();
@@ -33,6 +34,7 @@ var TelaAjustes = (function () {
       App.avisar('Impressora desconectada.');
     });
     document.getElementById('btnTeste').addEventListener('click', imprimirTeste);
+    document.getElementById('btnRegua').addEventListener('click', imprimirRegua);
     document.getElementById('btnPrevia').addEventListener('click', verPrevia);
     document.getElementById('fecharPrevia').addEventListener('click', fecharPrevia);
     document.getElementById('previa').addEventListener('click', function (ev) {
@@ -53,6 +55,8 @@ var TelaAjustes = (function () {
     document.getElementById('cfgLogoLargura').addEventListener('change', reconverterLogo);
     document.getElementById('cfgLogoLimite').addEventListener('change', reconverterLogo);
     desenharLogo();
+    campos.modoImpressao.addEventListener('change', mostrarDiagnostico);
+    mostrarDiagnostico();
 
     document.getElementById('btnBackup').addEventListener('click', baixarBackup);
     document.getElementById('btnRestaurar').addEventListener('click', function () {
@@ -73,6 +77,7 @@ var TelaAjustes = (function () {
     campos.cortar.checked = !!c.cortar;
     campos.fallback.checked = c.fallbackNavegador !== false;
     campos.logoNaFicha.checked = c.logoNaFicha !== false;
+    campos.modoImpressao.value = c.modoImpressao || 'bluetooth';
   }
 
   function salvar() {
@@ -85,13 +90,20 @@ var TelaAjustes = (function () {
       imprimirAoFinalizar: campos.aoFinalizar.value,
       cortar: campos.cortar.checked,
       fallbackNavegador: campos.fallback.checked,
-      logoNaFicha: campos.logoNaFicha.checked
+      logoNaFicha: campos.logoNaFicha.checked,
+      modoImpressao: campos.modoImpressao.value
     });
     App.atualizarCabecalho();
   }
 
   function imprimirTeste() {
     App.enviarParaImpressora(Cupom.doTeste(), 'Teste');
+  }
+
+  /* Mede a largura real da impressora, que nem sempre é a que está
+     escrita na caixa. */
+  function imprimirRegua() {
+    App.enviarParaImpressora(Cupom.doRegua(), 'Régua');
   }
 
   /* Mostra na tela como o papel vai sair, com um pedido de exemplo */
@@ -116,6 +128,42 @@ var TelaAjustes = (function () {
 
   function fecharPrevia() {
     document.getElementById('previa').classList.add('escondido');
+  }
+
+  /* Explica, na própria tela, o que dá e o que não dá neste aparelho.
+     "Não consegui conectar" sozinho não ajuda ninguém. */
+  function mostrarDiagnostico() {
+    var alvo = document.getElementById('diagnosticoImpressora');
+    var pelaJanela = campos.modoImpressao.value === 'navegador';
+    var d = Impressora.diagnostico();
+    var botoesBluetooth = ['btnConectar', 'btnDesconectar'];
+
+    botoesBluetooth.forEach(function (id) {
+      document.getElementById(id).classList.toggle('escondido', pelaJanela);
+    });
+
+    alvo.className = 'diagnostico';
+    if (pelaJanela) {
+      alvo.classList.add('neutro');
+      alvo.textContent = 'Ao finalizar, abre a janela de impressão do computador. ' +
+        'Escolha ali a impressora térmica e mande imprimir. ' +
+        'Funciona com qualquer impressora instalada no Windows, inclusive as ' +
+        'que o navegador não alcança por Bluetooth.';
+      return;
+    }
+
+    if (!d.disponivel) {
+      alvo.classList.add('ruim');
+      alvo.textContent = d.motivo + ' Enquanto isso, você pode usar a opção ' +
+        '"Pela janela de impressão" aqui em cima.';
+      return;
+    }
+
+    alvo.classList.add('neutro');
+    alvo.textContent = 'Ligue a impressora e clique em Conectar — o pareamento é feito ' +
+      'na janela do Chrome, não precisa parear no Windows antes. ' +
+      'Se a impressora não aparecer na lista, ela provavelmente é Bluetooth ' +
+      '"clássica": nesse caso use a opção "Pela janela de impressão".';
   }
 
   /* ---------- Imagem da ficha ---------- */
