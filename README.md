@@ -234,9 +234,17 @@ sw.js / manifest.json   fazem funcionar offline e instalar como aplicativo
 Todo valor em dinheiro é guardado em **centavos** (número inteiro), justamente
 para o caixa nunca fechar com diferença de um centavo por arredondamento.
 
-A troca de tema é uma bolha com `clip-path` animado, não View Transitions.
-As duas fazem o mesmo efeito, mas a segunda fotografa a página inteira antes
-de animar, e medindo deu 2 a 4 engasgos por troca contra zero da bolha.
+A troca de tema revela uma **cópia da tela já no tema novo**, por baixo de um
+círculo que cresce — por isso cada elemento aparece pronto conforme o círculo
+passa, em vez de a tela virar um chapado de cor.
+
+Não usa View Transitions, que faria o mesmo sozinho: ele fotografa a página e
+recorta a foto, e medindo os quadros isso dava 6 a 9 travadas por troca (33 a
+50 ms cada). Clonar a tela custa 1 a 2 ms e o recorte sai liso.
+
+Detalhe que não é óbvio: a cópia precisa declarar `color` explicitamente.
+Quem não declara cor própria herda a do `body` da página real, que ainda está
+no tema antigo — e o texto sumia no fundo escuro.
 
 O que vai para o papel não é texto solto: `cupom.js` devolve uma lista de
 **blocos** (`grande`, `negrito`, `linha`, `corte`...) e quem imprime traduz

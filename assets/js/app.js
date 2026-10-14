@@ -60,26 +60,67 @@ var App = (function () {
   }
 
   /* Troca o tema com o novo visual se espalhando em círculo a partir do
-     botão.
+     botão, revelando os elementos já no tema novo.
 
-     Antes isto usava View Transitions, que fotografa a página inteira
-     para poder revelar a nova por baixo. Medindo, a captura custava uns
-     50 ms e engasgava a animação 2 a 4 vezes por troca. Uma bolha com
-     clip-path animado roda a 60 quadros limpos, porque o navegador
-     resolve tudo na composição — e, de quebra, funciona em navegador
-     que não tem View Transitions. */
+     Como: uma cópia da tela, montada com o tema de destino, é colocada
+     por cima e revelada por um círculo que cresce. O tema de verdade só
+     muda no fim, com a tela já coberta — ninguém vê a troca acontecer.
+
+     Por que não View Transitions, que faz isso sozinho: ele fotografa a
+     página e recorta a foto, e medindo isso custava 6 a 9 quadros longos
+     por troca (33 a 50 ms cada), visíveis como travada. Clonar custa
+     1 a 2 ms e o recorte sai sem engasgo. */
   var trocandoTema = false;
+
+  /* Elementos que ficam presos na tela (grudados ou flutuantes). Na cópia
+     eles precisam ser fixados nas coordenadas de agora, senão vão parar
+     no lugar errado quando a página está rolada. */
+  var PRESOS = ['.pdv-carrinho', '.aviso', '.dialogo', '.previa'];
+
+  function montarCopia(escuro) {
+    var copia = document.createElement('div');
+    copia.className = 'copia-tema';
+    copia.setAttribute('aria-hidden', 'true');
+    if (escuro) copia.setAttribute('data-tema', 'escuro');
+
+    var dentro = document.createElement('div');
+    dentro.className = 'copia-tema-dentro';
+    var rolagem = window.scrollY || document.documentElement.scrollTop || 0;
+    dentro.style.transform = 'translateY(' + (-rolagem) + 'px)';
+
+    Array.prototype.forEach.call(document.body.children, function (filho) {
+      if (filho.classList && filho.classList.contains('copia-tema')) return;
+      dentro.appendChild(filho.cloneNode(true));
+    });
+    copia.appendChild(dentro);
+
+    /* a cópia ainda não entrou na página, então estas buscas só acham os
+       elementos de verdade */
+    PRESOS.forEach(function (seletor) {
+      var reais = document.querySelectorAll(seletor);
+      var copiados = copia.querySelectorAll(seletor);
+      for (var i = 0; i < copiados.length && i < reais.length; i++) {
+        var caixa = reais[i].getBoundingClientRect();
+        var alvo = copiados[i].style;
+        alvo.position = 'fixed';
+        alvo.margin = '0';
+        alvo.left = caixa.left + 'px';
+        alvo.top = caixa.top + 'px';
+        alvo.width = caixa.width + 'px';
+        alvo.height = caixa.height + 'px';
+      }
+    });
+
+    return copia;
+  }
 
   function alternarTema(ev) {
     if (trocandoTema) return;
     var escuro = !temaEscuro();
-    var animar = !(window.matchMedia &&
-      matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var animar = typeof document.body.animate === 'function' &&
+      !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-    if (!animar || typeof document.body.animate !== 'function') {
-      aplicarTema(escuro);
-      return;
-    }
+    if (!animar) { aplicarTema(escuro); return; }
 
     var raiz = document.documentElement;
     var alvo = (ev && ev.currentTarget) || document.getElementById('btnTema');
@@ -87,40 +128,34 @@ var App = (function () {
     var x = (ev && ev.clientX) || (caixa.left + caixa.width / 2);
     var y = (ev && ev.clientY) || (caixa.top + caixa.height / 2);
 
-    /* raio até o canto mais distante, senão sobra um pedaço sem pintar */
+    /* raio até o canto mais distante, senão sobra um pedaço sem revelar */
     var raio = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y)
     );
 
-    /* a cor vem das variáveis do tema de destino: nenhuma cor repetida aqui */
-    var cor = getComputedStyle(raiz)
-      .getPropertyValue(escuro ? '--fundo-escuro' : '--fundo-claro').trim();
-
-    var bolha = document.createElement('div');
-    bolha.className = 'bolha-tema';
-    bolha.style.background = cor;
-    document.body.appendChild(bolha);
+    var copia = montarCopia(escuro);
+    document.body.appendChild(copia);
 
     trocandoTema = true;
     raiz.classList.add('trocando-tema');
 
-    var animacao = bolha.animate(
+    var animacao = copia.animate(
       {
         clipPath: [
           'circle(0px at ' + x + 'px ' + y + 'px)',
           'circle(' + raio + 'px at ' + x + 'px ' + y + 'px)'
         ]
       },
-      { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }
+      { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }
     );
 
     function encerrar() {
-      /* a tela já está coberta pela bolha: trocar o tema agora é invisível */
+      /* a tela já está toda coberta pela cópia: trocar agora é invisível */
       aplicarTema(escuro);
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
-          if (bolha.parentNode) bolha.parentNode.removeChild(bolha);
+          if (copia.parentNode) copia.parentNode.removeChild(copia);
           raiz.classList.remove('trocando-tema');
           trocandoTema = false;
         });

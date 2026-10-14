@@ -45,7 +45,7 @@
   --aviso-fundo:#0f172a;
 }
 
-:root[data-tema="escuro"]{
+[data-tema="escuro"]{
   --fundo:var(--fundo-escuro);
   --papel:#101b2f;
   --papel-2:#17253d;
@@ -464,12 +464,18 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 @media (min-width:901px){.barra-resumo{display:none}}
 @media (max-width:900px){.atalhos-dica{display:none}}
 
-/* A bolha que varre a tela na troca de tema. É um elemento só, com
-   clip-path animado — o navegador resolve na composição, sem precisar
-   fotografar a página inteira. */
-.bolha-tema{
-  position:fixed;inset:0;z-index:200;pointer-events:none;will-change:clip-path;
+/* A cópia da tela que varre a página na troca de tema: ela já está no
+   tema de destino, e o círculo que cresce vai revelando os elementos
+   prontos. O tema de verdade só muda quando a cópia cobre tudo. */
+.copia-tema{
+  position:fixed;inset:0;z-index:200;overflow:hidden;pointer-events:none;
+  background:var(--fundo);will-change:clip-path;
+  /* a cor do texto PRECISA ser declarada aqui: quem não declara cor
+     própria herda a do body da página real, que ainda está no tema
+     antigo — e o texto sumia no fundo escuro */
+  color:var(--texto);
 }
+.copia-tema-dentro{position:absolute;left:0;top:0;width:100%}
 
 /* ===========================================================
    Animação da troca de tema
