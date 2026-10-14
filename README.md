@@ -54,8 +54,8 @@ impressora — e o tema novo entra num círculo que se abre a partir do botão.
 A escolha fica guardada naquele aparelho. Se o celular já estiver no modo
 escuro, o sistema abre escuro sozinho.
 
-(A animação usa View Transitions. Em navegador que não tem, ou para quem
-pediu menos animação nas configurações do aparelho, a troca é instantânea.)
+(Para quem pediu menos animação nas configurações do aparelho, a troca é
+instantânea.)
 
 As fichas impressas não mudam: papel branco e tinta preta nos dois temas.
 
@@ -233,6 +233,10 @@ sw.js / manifest.json   fazem funcionar offline e instalar como aplicativo
 
 Todo valor em dinheiro é guardado em **centavos** (número inteiro), justamente
 para o caixa nunca fechar com diferença de um centavo por arredondamento.
+
+A troca de tema é uma bolha com `clip-path` animado, não View Transitions.
+As duas fazem o mesmo efeito, mas a segunda fotografa a página inteira antes
+de animar, e medindo deu 2 a 4 engasgos por troca contra zero da bolha.
 
 O que vai para o papel não é texto solto: `cupom.js` devolve uma lista de
 **blocos** (`grande`, `negrito`, `linha`, `corte`...) e quem imprime traduz

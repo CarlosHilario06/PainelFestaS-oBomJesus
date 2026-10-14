@@ -6,7 +6,9 @@
    =========================================================== */
 
 :root{
-  --fundo:#f5f7fb;
+  --fundo-claro:#f5f7fb;
+  --fundo-escuro:#080f1d;
+  --fundo:var(--fundo-claro);
   --papel:#ffffff;
   --papel-2:#eef2f8;
   --borda:#e2e8f0;
@@ -44,7 +46,7 @@
 }
 
 :root[data-tema="escuro"]{
-  --fundo:#080f1d;
+  --fundo:var(--fundo-escuro);
   --papel:#101b2f;
   --papel-2:#17253d;
   --borda:#22314c;
@@ -88,7 +90,6 @@ body{
   font-size:16px;
   -webkit-text-size-adjust:100%;
 }
-:root,body{transition:background-color .18s ease,color .18s ease}
 
 /* ===== Topo (barra escura) ===== */
 .topo{
@@ -463,21 +464,28 @@ main{padding:18px;max-width:1400px;margin:0 auto}
 @media (min-width:901px){.barra-resumo{display:none}}
 @media (max-width:900px){.atalhos-dica{display:none}}
 
+/* A bolha que varre a tela na troca de tema. É um elemento só, com
+   clip-path animado — o navegador resolve na composição, sem precisar
+   fotografar a página inteira. */
+.bolha-tema{
+  position:fixed;inset:0;z-index:200;pointer-events:none;will-change:clip-path;
+}
+
 /* ===========================================================
    Animação da troca de tema
    O novo tema entra num círculo que cresce a partir do botão.
-   Quem não tem View Transitions troca na hora, sem animação.
+   Quem pediu menos animação no aparelho troca na hora.
    =========================================================== */
-::view-transition-old(root),
-::view-transition-new(root){
-  animation:none;mix-blend-mode:normal;
+/* Enquanto o círculo abre, nenhum elemento anima a própria cor.
+   Sem isto, cada botão, aba e cartão dispara a sua transição ao mesmo
+   tempo que a animação, e o navegador engasga recompondo tudo junto. */
+:root.trocando-tema *,
+:root.trocando-tema *::before,
+:root.trocando-tema *::after{
+  transition:none !important;
 }
-::view-transition-old(root){z-index:1}
-::view-transition-new(root){z-index:2}
 
-@media (prefers-reduced-motion:reduce){
-  :root,body{transition:none}
-}
+
 
 /* ==========================================================
    Celular - fica no FIM de propósito.

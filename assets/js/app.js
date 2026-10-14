@@ -60,16 +60,28 @@ var App = (function () {
   }
 
   /* Troca o tema com o novo visual se espalhando em círculo a partir do
-     botão. Se o navegador não tiver View Transitions (ou a pessoa pedir
-     menos animação no sistema), troca na hora — o resultado é o mesmo. */
+     botão.
+
+     Antes isto usava View Transitions, que fotografa a página inteira
+     para poder revelar a nova por baixo. Medindo, a captura custava uns
+     50 ms e engasgava a animação 2 a 4 vezes por troca. Uma bolha com
+     clip-path animado roda a 60 quadros limpos, porque o navegador
+     resolve tudo na composição — e, de quebra, funciona em navegador
+     que não tem View Transitions. */
+  var trocandoTema = false;
+
   function alternarTema(ev) {
+    if (trocandoTema) return;
     var escuro = !temaEscuro();
-    var animar = document.startViewTransition &&
-      !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var animar = !(window.matchMedia &&
+      matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-    if (!animar) { aplicarTema(escuro); return; }
+    if (!animar || typeof document.body.animate !== 'function') {
+      aplicarTema(escuro);
+      return;
+    }
 
-    /* centro do círculo: onde a pessoa clicou */
+    var raiz = document.documentElement;
     var alvo = (ev && ev.currentTarget) || document.getElementById('btnTema');
     var caixa = alvo.getBoundingClientRect();
     var x = (ev && ev.clientX) || (caixa.left + caixa.width / 2);
@@ -81,22 +93,45 @@ var App = (function () {
       Math.max(y, window.innerHeight - y)
     );
 
-    var transicao = document.startViewTransition(function () { aplicarTema(escuro); });
-    transicao.ready.then(function () {
-      document.documentElement.animate(
-        {
-          clipPath: [
-            'circle(0px at ' + x + 'px ' + y + 'px)',
-            'circle(' + raio + 'px at ' + x + 'px ' + y + 'px)'
-          ]
-        },
-        {
-          duration: 520,
-          easing: 'cubic-bezier(.4,0,.2,1)',
-          pseudoElement: '::view-transition-new(root)'
-        }
-      );
-    }).catch(function () { /* animação é enfeite: se falhar, o tema já trocou */ });
+    /* a cor vem das variáveis do tema de destino: nenhuma cor repetida aqui */
+    var cor = getComputedStyle(raiz)
+      .getPropertyValue(escuro ? '--fundo-escuro' : '--fundo-claro').trim();
+
+    var bolha = document.createElement('div');
+    bolha.className = 'bolha-tema';
+    bolha.style.background = cor;
+    document.body.appendChild(bolha);
+
+    trocandoTema = true;
+    raiz.classList.add('trocando-tema');
+
+    var animacao = bolha.animate(
+      {
+        clipPath: [
+          'circle(0px at ' + x + 'px ' + y + 'px)',
+          'circle(' + raio + 'px at ' + x + 'px ' + y + 'px)'
+        ]
+      },
+      { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }
+    );
+
+    function encerrar() {
+      /* a tela já está coberta pela bolha: trocar o tema agora é invisível */
+      aplicarTema(escuro);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (bolha.parentNode) bolha.parentNode.removeChild(bolha);
+          raiz.classList.remove('trocando-tema');
+          trocandoTema = false;
+        });
+      });
+    }
+
+    if (animacao.finished && animacao.finished.then) {
+      animacao.finished.then(encerrar).catch(encerrar);
+    } else {
+      animacao.onfinish = encerrar;
+    }
   }
 
   function mostrarTema() {
